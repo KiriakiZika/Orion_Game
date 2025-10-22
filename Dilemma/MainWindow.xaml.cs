@@ -15,14 +15,20 @@ using System.Windows.Shapes;
 
 namespace Dilemma
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWin : Window, IMainWin
     {
-        public MainWindow()
+        public MainWin()
         {
             InitializeComponent();
+
+            //define start image:
+            string filename = "image.jps";
+            AddBackground(filename);
+        }
+
+        public void AddBackground(string filename)
+        {
+
         }
     }
 }
