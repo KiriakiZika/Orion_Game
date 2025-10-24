@@ -13,5 +13,15 @@ namespace Dilemma
     /// </summary>
     public partial class App : Application
     {
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            //THIS IS WHERE THE APP BEGINS
+            var startWindow = new StartWin();
+            var mainWindow = new MainWin();
+
+            //WE START WITH STARTWIN, THEN GO TO MAINWIN VIA ORCHESTRATOR
+            var orchestrator = new AppOrchestrator(startWindow, mainWindow);
+            orchestrator.Run();
+        }
     }
 }

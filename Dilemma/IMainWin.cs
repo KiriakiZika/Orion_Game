@@ -8,5 +8,8 @@ namespace Dilemma
 {
     internal interface IMainWin
     {
+        void Show();
+        void Close();
+        //void Init();
     }
 }

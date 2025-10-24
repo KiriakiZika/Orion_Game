@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
@@ -20,11 +21,34 @@ namespace Dilemma
         private Grid mainGrid = new Grid(); // --- Main container ---
         private Palette p = new Palette();
 
+        public event EventHandler<OperationCompletedEventArgs> OperationCompleted;
+
         public StartWin()
         {
-            InitializeComponent();
-            Init();
-            Menu();
+            this.Closing += OnWindowClosing;
+            try
+            {
+                InitializeComponent();
+                Init();
+                Menu();
+            }
+            catch (Exception ex)
+            {
+                OnOperationCompleted(new OperationCompletedEventArgs(false, ex.Message));
+            }
+        }
+        private void OnWindowClosing(object sender, CancelEventArgs e)
+        {
+            //force-close
+            if (!AppOrchestrator.IsFinished)
+            {
+                Application.Current.Shutdown();
+            }
+            //normal close - open main window
+            else
+            {
+                this.Hide();
+            }
         }
 
         public void Init()
@@ -137,31 +161,33 @@ namespace Dilemma
                 switch (btn.Tag)
                 {
                     case 1:
-                        OpenMainWin();
+                        StartGame();
                         break;
                     case 2:
-                        
+
                         break;
                     case 3:
-                        
+
                         break;
                     case 4:
-                        
+
                         break;
                     case 5:
-                        
+
                         break;
                 }
             }
         }
 
-        //METHODS FOR MENU BUTTONS
-        public void OpenMainWin()
+        public void StartGame() 
         {
-            this.Hide();
-            MainWin mw = new MainWin();
-            mw.ShowDialog();
-            this.Close();
+            OnOperationCompleted(new OperationCompletedEventArgs(true, ""));
+        }
+
+        //EVENT-LISTENER FOR OPERATION COMPLETED
+        protected virtual void OnOperationCompleted(OperationCompletedEventArgs e)
+        {
+            OperationCompleted?.Invoke(this, e);
         }
     }
 }
