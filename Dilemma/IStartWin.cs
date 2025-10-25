@@ -12,7 +12,5 @@ namespace Dilemma
         event EventHandler<OperationCompletedEventArgs> OperationCompleted;
         void Show();
         void Close();
-        void Init();
-        void Menu();
     }
 }

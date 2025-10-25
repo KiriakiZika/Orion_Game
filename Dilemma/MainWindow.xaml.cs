@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,18 +18,92 @@ namespace Dilemma
 {
     public partial class MainWin : Window, IMainWin
     {
+        private Grid mainGrid = new Grid(); // --- Main container ---
+        private Palette p = new Palette();
         public MainWin()
         {
-            InitializeComponent();
+            this.Closing += OnWindowClosing;
+            try
+            {
+                InitializeComponent();
+                // --- Window properties ---
+                this.Title = "ORION";
+                this.WindowState = WindowState.Maximized;
+                this.Background = p.Colour1_champagne;
 
-            //define start image:
-            string filename = "image.jps";
-            AddBackground(filename);
+                // Define two rows: top for Label, rest for content
+                mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(2, GridUnitType.Star) }); // label row
+                mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // content row
+
+                // First row
+                FillRow1();
+                //Second row
+                FillRow2();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Main Window initialization failed. Error: {ex.Message}");
+            }
+        }
+        private void OnWindowClosing(object sender, CancelEventArgs e)
+        {
+            Application.Current.Shutdown();
         }
 
-        public void AddBackground(string filename)
+        public void FillRow1()
         {
+            Grid row1 = new Grid();
+            row1.ColumnDefinitions.Add(new ColumnDefinition
+            {
+                Width = new GridLength(2, GridUnitType.Star)
+            });
+            row1.ColumnDefinitions.Add(new ColumnDefinition
+            {
+                Width = new GridLength(1, GridUnitType.Star)
+            });
 
+            //Create left panel
+            var leftPanel = new StackPanel
+            {
+                Background = p.Colour3_cherry,
+                Margin = new Thickness(10)
+            };
+
+            // Create right panel
+            var rightPanel = new StackPanel
+            {
+                Background = p.Colour4_mountain,
+                Margin = new Thickness(10)
+            };
+
+            // Add panels to the grid
+            Grid.SetColumn(leftPanel, 0);
+            Grid.SetColumn(rightPanel, 1);
+            row1.Children.Add(leftPanel);
+            row1.Children.Add(rightPanel);
+
+            // Add row1 grid to maingrid
+            Grid.SetRow(row1, 0);
+            mainGrid.Children.Add(row1);
+
+            // --- Assign content ---
+            this.Content = mainGrid;
+        }
+        public void FillRow2()
+        {
+            //Create panel
+            var panel = new StackPanel
+            {
+                Background = p.Colour5_platinum,
+                Margin = new Thickness(10)
+            };
+
+            // Add panel to maingrid
+            Grid.SetRow(panel, 1);
+            mainGrid.Children.Add(panel);
+
+            // --- Assign content ---
+            this.Content = mainGrid;
         }
     }
 }

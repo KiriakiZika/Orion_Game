@@ -10,6 +10,5 @@ namespace Dilemma
     {
         void Show();
         void Close();
-        //void Init();
     }
 }

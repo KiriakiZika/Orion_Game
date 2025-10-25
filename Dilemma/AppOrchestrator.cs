@@ -22,8 +22,12 @@ namespace Dilemma
         }
         public void Run()
         {
-            IsFinished = false;
-            _startWin.Show();
+            //For main testing
+            _mainWin.Show();
+            
+            //CORRECT
+            //IsFinished = false;
+            //_startWin.Show();
         }
         private void OnClassACompleted(object sender, OperationCompletedEventArgs e)
         {

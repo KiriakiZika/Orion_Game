@@ -29,8 +29,19 @@ namespace Dilemma
             try
             {
                 InitializeComponent();
-                Init();
-                Menu();
+                // --- Window properties ---
+                this.Title = "ORION";
+                this.WindowState = WindowState.Maximized;
+                this.Background = p.Colour1_champagne;
+
+                // Define two rows: top for Label, rest for content
+                mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(0.3, GridUnitType.Star) }); // label row
+                mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // content row
+
+                //First row : Label
+                FillRow1();
+                //Second row : Menu
+                FillRow2();
             }
             catch (Exception ex)
             {
@@ -51,22 +62,12 @@ namespace Dilemma
             }
         }
 
-        public void Init()
+        public void FillRow1()
         {
-            // --- Window properties ---
-            this.Title = "DILEMMA";
-            this.WindowState = WindowState.Maximized;
-            this.Background = p.Colour1_champagne;
-
-            // Define two rows: top for Label, rest for content
-            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(0.3, GridUnitType.Star) }); // label row
-            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // content row
-
-
             // --- Label ---
             var label = new System.Windows.Controls.Label
             {
-                Content = "Welcome to Dilemma",
+                Content = "Welcome to Orion",
                 FontSize = 24,
                 FontFamily = new FontFamily("Reem Kufi"),
                 Foreground = p.Colour4_mountain,
@@ -79,7 +80,7 @@ namespace Dilemma
             // --- Assign content ---
             this.Content = mainGrid;
         }
-        public void Menu()
+        public void FillRow2()
         {
             // --- Content area (second row) ---
             var menuGrid = new Grid();
