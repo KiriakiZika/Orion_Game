@@ -57,12 +57,12 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppOrchestrator.cs" />
-    <Compile Include="OperationCompletedEventArgs.cs" />
+    <Compile Include="ErrorHandler.cs" />
     <Compile Include="Palette.cs" />
     <Compile Include="StartWin.xaml.cs">
       <DependentUpon>StartWin.xaml</DependentUpon>
     </Compile>
-    <Page Include="MainWindow.xaml">
+    <Page Include="MainWin.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -72,8 +72,8 @@
     </Compile>
     <Compile Include="IMainWin.cs" />
     <Compile Include="IStartWin.cs" />
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="MainWin.xaml.cs">
+      <DependentUpon>MainWin.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="StartWin.xaml">

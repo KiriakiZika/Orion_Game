@@ -21,7 +21,7 @@ namespace Dilemma
         private Grid mainGrid = new Grid(); // --- Main container ---
         private Palette p = new Palette();
 
-        public event EventHandler<OperationCompletedEventArgs> OperationCompleted;
+        public event EventHandler<ErrorHandler> OperationCompleted;
 
         public StartWin()
         {
@@ -45,7 +45,7 @@ namespace Dilemma
             }
             catch (Exception ex)
             {
-                OnOperationCompleted(new OperationCompletedEventArgs(false, ex.Message));
+                OnOperationCompleted(new ErrorHandler(false, ex.Message));
             }
         }
         private void OnWindowClosing(object sender, CancelEventArgs e)
@@ -182,11 +182,11 @@ namespace Dilemma
 
         public void StartGame() 
         {
-            OnOperationCompleted(new OperationCompletedEventArgs(true, ""));
+            OnOperationCompleted(new ErrorHandler(true, ""));
         }
 
         //EVENT-LISTENER FOR OPERATION COMPLETED
-        protected virtual void OnOperationCompleted(OperationCompletedEventArgs e)
+        protected virtual void OnOperationCompleted(ErrorHandler e)
         {
             OperationCompleted?.Invoke(this, e);
         }

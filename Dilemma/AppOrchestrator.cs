@@ -29,10 +29,10 @@ namespace Dilemma
             //IsFinished = false;
             //_startWin.Show();
         }
-        private void OnClassACompleted(object sender, OperationCompletedEventArgs e)
+        private void OnClassACompleted(object sender, ErrorHandler e)
         {
             if (!e.IsSuccessful)
-                MessageBox.Show($"Start Window failed. Error: {e.Message}");
+                e.ShowError();
 
             IsFinished = true;
             TransitionToMainWin();

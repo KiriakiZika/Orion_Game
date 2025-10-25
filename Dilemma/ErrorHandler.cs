@@ -3,18 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Dilemma
 {
-    public class OperationCompletedEventArgs : EventArgs
+    public class ErrorHandler : EventArgs
     {
         public bool IsSuccessful { get; }
         public string Message { get; }
 
-        public OperationCompletedEventArgs(bool isSuccessful, string message = "")
+        public ErrorHandler(bool isSuccessful, string message = "")
         {
             IsSuccessful = isSuccessful;
             Message = message;
+        }
+
+        public void ShowError()
+        {
+            MessageBox.Show($"Error: {Message}");
         }
     }
 

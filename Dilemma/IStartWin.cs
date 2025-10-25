@@ -9,7 +9,7 @@ namespace Dilemma
 {
     internal interface IStartWin
     {
-        event EventHandler<OperationCompletedEventArgs> OperationCompleted;
+        event EventHandler<ErrorHandler> OperationCompleted;
         void Show();
         void Close();
     }

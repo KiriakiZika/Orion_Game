@@ -42,7 +42,7 @@ namespace Dilemma
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Main Window initialization failed. Error: {ex.Message}");
+                ErrorHandler error = new ErrorHandler(false,ex.Message);
             }
         }
         private void OnWindowClosing(object sender, CancelEventArgs e)
