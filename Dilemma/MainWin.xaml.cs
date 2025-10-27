@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Dilemma
 {
@@ -57,9 +58,10 @@ namespace Dilemma
         }
         private void OnWindowClosing(object sender, CancelEventArgs e)
         {
-            Application.Current.Shutdown();
+            System.Windows.Application.Current.Shutdown();
         }
 
+        //IMAGE AND CHOICE PANEL
         public void FillRow1()
         {
             Grid row1 = new Grid();
@@ -72,25 +74,17 @@ namespace Dilemma
                 Width = new GridLength(1, GridUnitType.Star)
             });
 
-            //Create left panel
-            var leftPanel = new StackPanel
-            {
-                Background = p.Colour3_cherry,
-                Margin = new Thickness(10)
-            };
+            //Create character image (LEFT)
+            Grid characterImage = SetColumn1();
 
             // Create right panel
-            var rightPanel = new StackPanel
-            {
-                Background = p.Colour4_mountain,
-                Margin = new Thickness(10)
-            };
+            Grid choiceGrid = SetColumn2();
 
             // Add panels to the grid
-            Grid.SetColumn(leftPanel, 0);
-            Grid.SetColumn(rightPanel, 1);
-            row1.Children.Add(leftPanel);
-            row1.Children.Add(rightPanel);
+            Grid.SetColumn(characterImage, 0);
+            Grid.SetColumn(choiceGrid, 1);
+            row1.Children.Add(characterImage);
+            row1.Children.Add(choiceGrid);
 
             // Add row1 grid to maingrid
             Grid.SetRow(row1, 0);
@@ -99,6 +93,62 @@ namespace Dilemma
             // --- Assign content ---
             this.Content = mainGrid;
         }
+        private Grid SetColumn1()
+        {
+            //Contain image or else it doesn't work smh
+            Grid container = new Grid() { Margin = new Thickness(10) };
+
+            // Create an Image control
+            System.Windows.Controls.Image bgImage = new System.Windows.Controls.Image()
+            {
+                Stretch = Stretch.UniformToFill,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            // Try loading main image
+            try
+            {
+                string imageName = "sample.jpg";
+                string path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"imgs/{imageName}");
+                BitmapImage bitmap = new BitmapImage(new Uri(path, UriKind.Absolute));
+                bgImage.Source = bitmap;
+
+                container.Children.Add(bgImage);
+            }
+            // Load error/fallback image (it is in resources)
+            catch (Exception)
+            {
+
+                TextBox errorPanel = new TextBox()
+                {
+                    //text controls
+                    Text = "Image couldn't load.",
+                    FontFamily = new FontFamily("Reem Kufi"),
+                    FontSize = 20,
+                    TextAlignment = TextAlignment.Center,
+                    Padding = new Thickness(15),
+                    Foreground = p.ColourX_error,
+                    Background = Brushes.Transparent,
+                    IsReadOnly = true
+                };
+
+                container.Children.Add(errorPanel);
+            }
+
+            return container;
+        }
+        private Grid SetColumn2()
+        {
+            Grid container = new Grid() 
+            { 
+                Margin = new Thickness(10) ,
+                Background = p.Colour4_mountain
+            };
+            return container;
+        }
+
+        //DIALOGUE BOX
         public void FillRow2()
         {
             // Create textbox for dialogue, description and thoughts
@@ -108,8 +158,8 @@ namespace Dilemma
                 Text = "Sample text here.",
                 FontFamily = new FontFamily("Reem Kufi"),
                 FontSize = 20,
-                Foreground = p.Colour4_mountain,
                 Padding = new Thickness(15), //how indented the text is inside dialogueBox
+                Foreground = p.Colour4_mountain,
                 //textbox controls
                 Background = Brushes.Transparent,
                 IsReadOnly = true,

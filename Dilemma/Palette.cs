@@ -16,5 +16,6 @@ namespace Dilemma
         public readonly SolidColorBrush Colour3_cherry = (SolidColorBrush)new BrushConverter().ConvertFrom("#F4ACB7");
         public readonly SolidColorBrush Colour4_mountain = (SolidColorBrush)new BrushConverter().ConvertFrom("#9D8189");
         public readonly SolidColorBrush Colour5_platinum = (SolidColorBrush)new BrushConverter().ConvertFrom("#D8E2DC");
+        public readonly SolidColorBrush ColourX_error = (SolidColorBrush)new BrushConverter().ConvertFrom("#6F170B");
     }
 }
