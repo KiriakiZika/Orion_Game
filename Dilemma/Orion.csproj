@@ -57,6 +57,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppOrchestrator.cs" />
+    <Compile Include="ChoiceButton.cs" />
     <Compile Include="ErrorHandler.cs" />
     <Compile Include="Palette.cs" />
     <Compile Include="StartWin.xaml.cs">

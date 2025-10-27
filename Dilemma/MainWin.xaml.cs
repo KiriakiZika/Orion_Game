@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Dilemma
@@ -26,6 +27,8 @@ namespace Dilemma
             //Event Listeners for window
             this.SizeChanged += Window_SizeChanged;
             this.Closing += OnWindowClosing;
+            // Subscribe to PreviewKeyDown for global capture
+            this.PreviewKeyDown += MainWindow_PreviewKeyDown;
 
             //Main program
             try
@@ -60,6 +63,14 @@ namespace Dilemma
         {
             System.Windows.Application.Current.Shutdown();
         }
+        private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            //Whenever you press Enter, it triggers the Continue button
+            if (e.Key == Key.Enter)
+            {
+                ContinueButtonClicked(sender, e);
+            }
+        }
 
         //IMAGE AND CHOICE PANEL
         public void FillRow1()
@@ -77,7 +88,7 @@ namespace Dilemma
             //Create character image (LEFT)
             Grid characterImage = SetColumn1();
 
-            // Create right panel
+            // Create choice panel (RIGHT) - can pass button contents as string array
             Grid choiceGrid = SetColumn2();
 
             // Add panels to the grid
@@ -138,19 +149,70 @@ namespace Dilemma
 
             return container;
         }
-        private Grid SetColumn2()
+        private Grid SetColumn2(string[] buttonContents = null )
         {
-            Grid container = new Grid() 
-            { 
-                Margin = new Thickness(10) ,
-                Background = p.Colour4_mountain
+            // Create container Grid
+            Grid container = new Grid() { Margin = new Thickness(10) };
+            // Add a single row that fills the Grid
+            container.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+
+            if (buttonContents == null || buttonContents.Length == 0)
+            {
+                buttonContents = new string[] { "cry","drink coffee","jump off a bridge" };
+            }
+
+            // Create a nested Grid to hold buttons vertically
+            Grid buttonGrid = new Grid
+            {
+                VerticalAlignment = VerticalAlignment.Center, // <-- centers the buttons
+                HorizontalAlignment = HorizontalAlignment.Stretch
             };
+
+            //temp array to hold buttons
+            ChoiceButton[] buttons = new ChoiceButton[buttonContents.Length];
+            //Create rows and buttons
+            for (int i = 0; i < buttonContents.Length; i++)
+            {
+                buttonGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+                ChoiceButton cb = new ChoiceButton
+                {
+                    Content = $"{buttonContents[i]}",
+                    FontFamily = new FontFamily("Reem Kufi"),
+                    FontSize = 20,
+                    Padding = new Thickness(10), //inside
+                    Margin = new Thickness(10), //outside
+                    Background = p.Colour4_mountain,
+                    Foreground = p.Colour1_champagne,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                };
+                Grid.SetRow(cb, i);
+                buttonGrid.Children.Add(cb);
+                buttons[i] = cb;
+            }
+            container.Children.Add(buttonGrid);
+
+            // Force layout update to get ActualWidth
+            buttonGrid.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            buttonGrid.Arrange(new Rect(buttonGrid.DesiredSize));
+
+            // Find the widest button
+            double maxWidth = buttons.Max(b => b.ActualWidth);
+            // Set all buttons to the same width
+            foreach (var b in buttons)
+            {
+                b.Width = maxWidth;
+            }
+
             return container;
         }
 
         //DIALOGUE BOX
         public void FillRow2()
         {
+            Grid row2 = new Grid() { Margin = new Thickness(10) };
+
             // Create textbox for dialogue, description and thoughts
             TextBox dialogueBox = new TextBox()
             {
@@ -163,15 +225,38 @@ namespace Dilemma
                 //textbox controls
                 Background = Brushes.Transparent,
                 IsReadOnly = true,
-                Margin = new Thickness(10) //how indented the dialogueBox is inside parent (row 2)
+                //Margin = new Thickness(10) //how indented the dialogueBox is inside parent (row 2)
             };
+            row2.Children.Add(dialogueBox);
 
-            // Add textbox to maingrid
-            Grid.SetRow(dialogueBox, 1);
-            mainGrid.Children.Add(dialogueBox);
+            // Continue Button
+            Button continueButton = new Button
+            {
+                Content = ">>>",
+                FontFamily = new FontFamily("Reem Kufi"),
+                FontSize = 20,
+                Background = Brushes.Transparent,
+                //extra border
+                //BorderBrush = Brushes.Gray,
+                //BorderThickness = new Thickness(1),
+                Padding = new Thickness(5),
+                Margin = new Thickness(10),
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Bottom
+            };
+            continueButton.Click += ContinueButtonClicked;
+            row2.Children.Add(continueButton);
+
+            // Add row2 to maingrid
+            Grid.SetRow(row2, 1);
+            mainGrid.Children.Add(row2);
 
             // --- Assign content ---
             this.Content = mainGrid;
+        }
+        private void ContinueButtonClicked(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Next Dialogue Bubble");
         }
     }
 }
