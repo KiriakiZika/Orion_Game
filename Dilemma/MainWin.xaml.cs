@@ -297,6 +297,10 @@ namespace Dilemma
         private void ContinueButtonClicked(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Next Dialogue Bubble");
+
+            // Move focus to the window
+            this.Focus();  // set logical focus to the window
+            FocusManager.SetFocusedElement(this, this);
         }
     }
 }
