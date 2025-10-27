@@ -11,6 +11,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.TextFormatting;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml.Linq;
@@ -37,7 +38,11 @@ namespace Dilemma
                 // --- Window properties ---
                 this.Title = "ORION";
                 this.WindowState = WindowState.Maximized;
-                this.Background = p.Colour1_champagne;
+
+                Grid motherGrid = new Grid();
+                Grid background = TryToLoadImage("background.jpg");
+                motherGrid.Children.Add(background);
+                motherGrid.Children.Add(mainGrid);
 
                 // Define two rows: top for Label, rest for content
                 mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(2, GridUnitType.Star) }); // label row
@@ -47,6 +52,8 @@ namespace Dilemma
                 FillRow1();
                 //Second row
                 FillRow2();
+
+                this.Content = motherGrid;
             }
             catch (Exception ex)
             {
@@ -71,43 +78,10 @@ namespace Dilemma
                 ContinueButtonClicked(sender, e);
             }
         }
-
-        //IMAGE AND CHOICE PANEL
-        public void FillRow1()
+        private Grid TryToLoadImage(string imageName)
         {
-            Grid row1 = new Grid();
-            row1.ColumnDefinitions.Add(new ColumnDefinition
-            {
-                Width = new GridLength(2, GridUnitType.Star)
-            });
-            row1.ColumnDefinitions.Add(new ColumnDefinition
-            {
-                Width = new GridLength(1, GridUnitType.Star)
-            });
-
-            //Create character image (LEFT)
-            Grid characterImage = SetColumn1();
-
-            // Create choice panel (RIGHT) - can pass button contents as string array
-            Grid choiceGrid = SetColumn2();
-
-            // Add panels to the grid
-            Grid.SetColumn(characterImage, 0);
-            Grid.SetColumn(choiceGrid, 1);
-            row1.Children.Add(characterImage);
-            row1.Children.Add(choiceGrid);
-
-            // Add row1 grid to maingrid
-            Grid.SetRow(row1, 0);
-            mainGrid.Children.Add(row1);
-
-            // --- Assign content ---
-            this.Content = mainGrid;
-        }
-        private Grid SetColumn1()
-        {
-            //Contain image or else it doesn't work smh
-            Grid container = new Grid() { Margin = new Thickness(10) };
+            //will carry the results
+            Grid container = new Grid();
 
             // Create an Image control
             System.Windows.Controls.Image bgImage = new System.Windows.Controls.Image()
@@ -120,7 +94,6 @@ namespace Dilemma
             // Try loading main image
             try
             {
-                string imageName = "sample.jpg";
                 string path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"imgs/{imageName}");
                 BitmapImage bitmap = new BitmapImage(new Uri(path, UriKind.Absolute));
                 bgImage.Source = bitmap;
@@ -146,10 +119,73 @@ namespace Dilemma
 
                 container.Children.Add(errorPanel);
             }
+            return container;
+        }
+
+        //IMAGE AND CHOICE PANEL
+        public void FillRow1()
+        {
+            Grid row1_container = new Grid();
+            //Grid img = TryToLoadImage("background.jpg");
+            //row1_container.Children.Add(img);
+
+            Grid row1 = new Grid() { Margin = new Thickness(0) };
+            // Define two columns: left for image, right for choices
+            row1.ColumnDefinitions.Add(new ColumnDefinition
+            {
+                Width = new GridLength(2, GridUnitType.Star)
+            });
+            row1.ColumnDefinitions.Add(new ColumnDefinition
+            {
+                Width = new GridLength(1, GridUnitType.Star)
+            });
+            row1_container.Children.Add(row1);
+
+            //Create character image (LEFT)
+            Grid characterImage = SetColumn1();
+
+            // Create choice panel (RIGHT) - can pass button contents as string array
+            Grid choiceGrid = SetColumn2();
+
+            // Add panels to the grid
+            Grid.SetColumn(characterImage, 0);
+            Grid.SetColumn(choiceGrid, 1);
+            row1.Children.Add(characterImage);
+            row1.Children.Add(choiceGrid);
+
+            // Add row1 grid to maingrid
+            Grid.SetRow(row1_container, 0);
+            mainGrid.Children.Add(row1_container);
+
+            // --- Assign content ---
+            this.Content = mainGrid;
+        }
+        //IMAGE(S)
+        private Grid SetColumn1()
+        {
+            //Contain image or else it doesn't work smh
+            Grid container = new Grid();
+            container.ColumnDefinitions.Add(new ColumnDefinition
+            {
+                Width = new GridLength(1, GridUnitType.Star)
+            });
+            container.ColumnDefinitions.Add(new ColumnDefinition
+            {
+                Width = new GridLength(1, GridUnitType.Star)
+            });
+
+            Grid img1 = TryToLoadImage("choso.png");
+            Grid img2 = TryToLoadImage("lawliet.png");
+
+            Grid.SetColumn(img1, 0);
+            Grid.SetColumn(img2, 1);
+            container.Children.Add(img1);
+            container.Children.Add(img2);
 
             return container;
         }
-        private Grid SetColumn2(string[] buttonContents = null )
+        //CHOICE BUTTONS
+        private Grid SetColumn2(string[] buttonContents = null)
         {
             // Create container Grid
             Grid container = new Grid() { Margin = new Thickness(10) };
@@ -211,7 +247,7 @@ namespace Dilemma
         //DIALOGUE BOX
         public void FillRow2()
         {
-            Grid row2 = new Grid() { Margin = new Thickness(10) };
+            Grid row2 = new Grid();
 
             // Create textbox for dialogue, description and thoughts
             TextBox dialogueBox = new TextBox()
@@ -221,11 +257,14 @@ namespace Dilemma
                 FontFamily = new FontFamily("Reem Kufi"),
                 FontSize = 20,
                 Padding = new Thickness(15), //how indented the text is inside dialogueBox
-                Foreground = p.Colour4_mountain,
+                Foreground = p.Colour6_darkbrown,
                 //textbox controls
-                Background = Brushes.Transparent,
+                IsEnabled = false,
+                BorderBrush = p.Colour6_darkbrown,
+                BorderThickness = new Thickness(10),
+                Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)), // 128 = 50% opacity
                 IsReadOnly = true,
-                //Margin = new Thickness(10) //how indented the dialogueBox is inside parent (row 2)
+                Margin = new Thickness(10) //how indented the dialogueBox is inside parent (row 2)
             };
             row2.Children.Add(dialogueBox);
 
@@ -235,12 +274,13 @@ namespace Dilemma
                 Content = ">>>",
                 FontFamily = new FontFamily("Reem Kufi"),
                 FontSize = 20,
+                Foreground = p.Colour1_champagne,
                 Background = Brushes.Transparent,
                 //extra border
-                //BorderBrush = Brushes.Gray,
-                //BorderThickness = new Thickness(1),
+                BorderBrush = p.Colour6_darkbrown,
+                BorderThickness = new Thickness(2),
                 Padding = new Thickness(5),
-                Margin = new Thickness(10),
+                Margin = new Thickness(35),
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = VerticalAlignment.Bottom
             };
