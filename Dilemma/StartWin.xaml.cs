@@ -25,7 +25,11 @@ namespace Dilemma
 
         public StartWin()
         {
+            //Event Listeners for window
+            this.SizeChanged += Window_SizeChanged;
             this.Closing += OnWindowClosing;
+
+            //Main program
             try
             {
                 InitializeComponent();
@@ -47,6 +51,12 @@ namespace Dilemma
             {
                 OnOperationCompleted(new ErrorHandler(false, ex.Message));
             }
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            this.InvalidateVisual();
+            this.UpdateLayout();
         }
         private void OnWindowClosing(object sender, CancelEventArgs e)
         {

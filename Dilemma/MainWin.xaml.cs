@@ -22,7 +22,11 @@ namespace Dilemma
         private Palette p = new Palette();
         public MainWin()
         {
+            //Event Listeners for window
+            this.SizeChanged += Window_SizeChanged;
             this.Closing += OnWindowClosing;
+
+            //Main program
             try
             {
                 InitializeComponent();
@@ -44,6 +48,12 @@ namespace Dilemma
             {
                 ErrorHandler error = new ErrorHandler(false,ex.Message);
             }
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            this.InvalidateVisual();
+            this.UpdateLayout();
         }
         private void OnWindowClosing(object sender, CancelEventArgs e)
         {
@@ -91,16 +101,24 @@ namespace Dilemma
         }
         public void FillRow2()
         {
-            //Create panel
-            var panel = new StackPanel
+            // Create textbox for dialogue, description and thoughts
+            TextBox dialogueBox = new TextBox()
             {
-                Background = p.Colour5_platinum,
-                Margin = new Thickness(10)
+                //text controls
+                Text = "Sample text here.",
+                FontFamily = new FontFamily("Reem Kufi"),
+                FontSize = 20,
+                Foreground = p.Colour4_mountain,
+                Padding = new Thickness(15), //how indented the text is inside dialogueBox
+                //textbox controls
+                Background = Brushes.Transparent,
+                IsReadOnly = true,
+                Margin = new Thickness(10) //how indented the dialogueBox is inside parent (row 2)
             };
 
-            // Add panel to maingrid
-            Grid.SetRow(panel, 1);
-            mainGrid.Children.Add(panel);
+            // Add textbox to maingrid
+            Grid.SetRow(dialogueBox, 1);
+            mainGrid.Children.Add(dialogueBox);
 
             // --- Assign content ---
             this.Content = mainGrid;

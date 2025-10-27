@@ -26,8 +26,8 @@ namespace Dilemma
             _mainWin.Show();
             
             //CORRECT
-            //IsFinished = false;
-            //_startWin.Show();
+            /*IsFinished = false;
+            _startWin.Show();*/
         }
         private void OnClassACompleted(object sender, ErrorHandler e)
         {
