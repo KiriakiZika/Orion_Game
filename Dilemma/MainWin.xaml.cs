@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -21,9 +22,13 @@ namespace Dilemma
 {
     public partial class MainWin : Window, IMainWin
     {
-        private Grid mainGrid = new Grid(); // --- Main container ---
+        //UI Components
+        private Grid mainGrid;
         private Palette p = new Palette();
-        public MainWin()
+
+        //Game Components
+        //List<Grid> characters = new List<Grid>();
+        public MainWin(string[] charFiles = null, string[] buttonContents = null, string text=null)
         {
             //Event Listeners for window
             this.SizeChanged += Window_SizeChanged;
@@ -31,33 +36,29 @@ namespace Dilemma
             // Subscribe to PreviewKeyDown for global capture
             this.PreviewKeyDown += MainWindow_PreviewKeyDown;
 
-            //Main program
+            //GUI Setup
             try
             {
                 InitializeComponent();
                 // --- Window properties ---
                 this.Title = "ORION";
                 this.WindowState = WindowState.Maximized;
-
-                Grid motherGrid = new Grid();
-                Grid background = TryToLoadImage("background.jpg");
-                motherGrid.Children.Add(background);
-                motherGrid.Children.Add(mainGrid);
-
-                // Define two rows: top for Label, rest for content
-                mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(2, GridUnitType.Star) }); // label row
-                mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // content row
-
-                // First row
-                FillRow1();
-                //Second row
-                FillRow2();
-
-                this.Content = motherGrid;
+                //
+                SetGUI();
             }
             catch (Exception ex)
             {
                 ErrorHandler error = new ErrorHandler(false,ex.Message);
+            }
+
+            //Game start
+            try 
+            {
+                StartGame();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler error = new ErrorHandler(false, ex.Message);
             }
         }
 
@@ -122,14 +123,47 @@ namespace Dilemma
             return container;
         }
 
-        //IMAGE AND CHOICE PANEL
-        public void FillRow1()
-        {
-            Grid row1_container = new Grid();
-            //Grid img = TryToLoadImage("background.jpg");
-            //row1_container.Children.Add(img);
 
+        //////////////////////////////////////////////////////
+        //UI COMPONENTS
+        public void SetGUI(string[] charFiles = null, string[] buttonContents = null, string text = null) 
+        {
+            Grid motherGrid = new Grid();
+            motherGrid.ColumnDefinitions.Clear();
+            motherGrid.RowDefinitions.Clear();
+            motherGrid.Children.Clear();
+
+            //BACKGROUND IMAGE
+            Grid background = TryToLoadImage("background.jpg");
+            motherGrid.Children.Add(background);
+            
+            //Clear previous mainGrid content (if any) + new instance
+            mainGrid = new Grid();
+            mainGrid.ColumnDefinitions.Clear();
+            mainGrid.RowDefinitions.Clear();
+            mainGrid.Children.Clear();
+            motherGrid.Children.Add(mainGrid);
+
+            // Define two rows: top for Label, rest for content
+            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(2, GridUnitType.Star) }); // label row
+            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // content row
+
+            // First row
+            FillRow1(charFiles, buttonContents);
+            //Second row
+            SetDialogueBubble(text);
+
+            this.Content = motherGrid;
+        }
+
+        //IMAGE AND CHOICE PANEL
+        private void FillRow1(string[] charFiles = null, string[] buttonContents = null)
+        {
             Grid row1 = new Grid() { Margin = new Thickness(0) };
+            row1.ColumnDefinitions.Clear();
+            row1.RowDefinitions.Clear();
+            row1.Children.Clear();
+
             // Define two columns: left for image, right for choices
             row1.ColumnDefinitions.Add(new ColumnDefinition
             {
@@ -139,13 +173,12 @@ namespace Dilemma
             {
                 Width = new GridLength(1, GridUnitType.Star)
             });
-            row1_container.Children.Add(row1);
 
             //Create character image (LEFT)
-            Grid characterImage = SetColumn1();
+            Grid characterImage = SetCharacters(charFiles);
 
-            // Create choice panel (RIGHT) - can pass button contents as string array
-            Grid choiceGrid = SetColumn2();
+            // Create choice panel (RIGHT)
+            Grid choiceGrid = SetChoices(buttonContents);
 
             // Add panels to the grid
             Grid.SetColumn(characterImage, 0);
@@ -154,41 +187,51 @@ namespace Dilemma
             row1.Children.Add(choiceGrid);
 
             // Add row1 grid to maingrid
-            Grid.SetRow(row1_container, 0);
-            mainGrid.Children.Add(row1_container);
+            Grid.SetRow(row1, 0);
+            mainGrid.Children.Add(row1);
 
             // --- Assign content ---
             this.Content = mainGrid;
         }
-        //IMAGE(S)
-        private Grid SetColumn1()
+        //Characters
+        private Grid SetCharacters(string[] charFiles = null)
         {
-            //Contain image or else it doesn't work smh
             Grid container = new Grid();
-            container.ColumnDefinitions.Add(new ColumnDefinition
-            {
-                Width = new GridLength(1, GridUnitType.Star)
-            });
-            container.ColumnDefinitions.Add(new ColumnDefinition
-            {
-                Width = new GridLength(1, GridUnitType.Star)
-            });
+            container.ColumnDefinitions.Clear();
+            container.RowDefinitions.Clear();
+            container.Children.Clear();
 
-            Grid img1 = TryToLoadImage("choso.png");
-            Grid img2 = TryToLoadImage("lawliet.png");
+            //Temp array of images
+            if (charFiles == null || charFiles.Length == 0)
+            {
+                charFiles = new string[] { "choso.png", "lawliet.png", "choso.png", "lawliet.png" };
+            }
 
-            Grid.SetColumn(img1, 0);
-            Grid.SetColumn(img2, 1);
-            container.Children.Add(img1);
-            container.Children.Add(img2);
+            for (int i = 0; i < charFiles.Length; i++)
+            {
+                // Add a new column
+                container.ColumnDefinitions.Add(new ColumnDefinition
+                {
+                    Width = new GridLength(1, GridUnitType.Star)
+                });
+
+                // Load and add image=character to the column
+                Grid character = TryToLoadImage(charFiles[i]);
+                Grid.SetColumn(character, i);
+                container.Children.Add(character);
+            }
 
             return container;
         }
         //CHOICE BUTTONS
-        private Grid SetColumn2(string[] buttonContents = null)
+        private Grid SetChoices(string[] buttonContents = null)
         {
             // Create container Grid
             Grid container = new Grid() { Margin = new Thickness(10) };
+            container.ColumnDefinitions.Clear();
+            container.RowDefinitions.Clear();
+            container.Children.Clear();
+
             // Add a single row that fills the Grid
             container.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
@@ -240,20 +283,22 @@ namespace Dilemma
             {
                 b.Width = maxWidth;
             }
-
             return container;
         }
 
         //DIALOGUE BOX
-        public void FillRow2()
+        private void SetDialogueBubble(string text)
         {
             Grid row2 = new Grid();
+            row2.ColumnDefinitions.Clear();
+            row2.RowDefinitions.Clear();
+            row2.Children.Clear();
 
             // Create textbox for dialogue, description and thoughts
             TextBox dialogueBox = new TextBox()
             {
                 //text controls
-                Text = "Sample text here.",
+                Text = "Text couldn't load.",
                 FontFamily = new FontFamily("Reem Kufi"),
                 FontSize = 20,
                 Padding = new Thickness(15), //how indented the text is inside dialogueBox
@@ -266,6 +311,10 @@ namespace Dilemma
                 IsReadOnly = true,
                 Margin = new Thickness(10) //how indented the dialogueBox is inside parent (row 2)
             };
+            if (text != null)
+            {
+                dialogueBox.Text = text;
+            }
             row2.Children.Add(dialogueBox);
 
             // Continue Button
@@ -301,6 +350,14 @@ namespace Dilemma
             // Move focus to the window
             this.Focus();  // set logical focus to the window
             FocusManager.SetFocusedElement(this, this);
+        }
+
+
+        //////////////////////////////////////////////////////
+        //GAME COMPONENTS
+        private void StartGame()
+        {
+            SetGUI(charFiles: new string[] { "choso.png","choso.png" });
         }
     }
 }
