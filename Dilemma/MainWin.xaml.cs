@@ -24,7 +24,7 @@ namespace Dilemma
     {
         //UI Components
         private Grid mainGrid;
-        private Palette p = new Palette();
+        private IPalette p = new Palette();
 
         //Game Components
         //List<Grid> characters = new List<Grid>();
@@ -113,7 +113,7 @@ namespace Dilemma
                     FontSize = 20,
                     TextAlignment = TextAlignment.Center,
                     Padding = new Thickness(15),
-                    Foreground = p.ColourX_error,
+                    Foreground = p.GetColour("Error"),
                     Background = Brushes.Transparent,
                     IsReadOnly = true
                 };
@@ -261,8 +261,8 @@ namespace Dilemma
                     FontSize = 20,
                     Padding = new Thickness(10), //inside
                     Margin = new Thickness(10), //outside
-                    Background = p.Colour4_mountain,
-                    Foreground = p.Colour1_champagne,
+                    Background = p.GetColour("Mountain"),
+                    Foreground = p.GetColour("Champagne"),
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Center
                 };
@@ -302,10 +302,10 @@ namespace Dilemma
                 FontFamily = new FontFamily("Reem Kufi"),
                 FontSize = 20,
                 Padding = new Thickness(15), //how indented the text is inside dialogueBox
-                Foreground = p.Colour6_darkbrown,
+                Foreground = p.GetColour("DarkBrown"),
                 //textbox controls
                 IsEnabled = false,
-                BorderBrush = p.Colour6_darkbrown,
+                BorderBrush = p.GetColour("DarkBrown"),
                 BorderThickness = new Thickness(10),
                 Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)), // 128 = 50% opacity
                 IsReadOnly = true,
@@ -323,10 +323,10 @@ namespace Dilemma
                 Content = ">>>",
                 FontFamily = new FontFamily("Reem Kufi"),
                 FontSize = 20,
-                Foreground = p.Colour1_champagne,
+                Foreground = p.GetColour("Champagne"),
                 Background = Brushes.Transparent,
                 //extra border
-                BorderBrush = p.Colour6_darkbrown,
+                BorderBrush = p.GetColour("DarkBrown"),
                 BorderThickness = new Thickness(2),
                 Padding = new Thickness(5),
                 Margin = new Thickness(35),

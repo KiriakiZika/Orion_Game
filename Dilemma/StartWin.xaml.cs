@@ -19,7 +19,7 @@ namespace Dilemma
     public partial class StartWin : Window, IStartWin
     {
         private Grid mainGrid = new Grid(); // --- Main container ---
-        private Palette p = new Palette();
+        private IPalette p = new Palette();
 
         public event EventHandler<ErrorHandler> OperationCompleted;
 
@@ -36,7 +36,7 @@ namespace Dilemma
                 // --- Window properties ---
                 this.Title = "ORION";
                 this.WindowState = WindowState.Maximized;
-                this.Background = p.Colour1_champagne;
+                this.Background = p.GetColour("Champagne");
 
                 // Define two rows: top for Label, rest for content
                 mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(0.3, GridUnitType.Star) }); // label row
@@ -80,7 +80,7 @@ namespace Dilemma
                 Content = "Welcome to Orion",
                 FontSize = 24,
                 FontFamily = new FontFamily("Reem Kufi"),
-                Foreground = p.Colour4_mountain,
+                Foreground = p.GetColour("Mountain"),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center
             };
@@ -99,7 +99,7 @@ namespace Dilemma
             // --- Panel for vertical orientation = buttons below each other
             var buttonPanel = new StackPanel
             {
-                Background = p.Colour5_platinum,
+                Background = p.GetColour("Platinum"),
                 Orientation = Orientation.Vertical,
                 VerticalAlignment = VerticalAlignment.Top,
                 HorizontalAlignment = HorizontalAlignment.Center,
