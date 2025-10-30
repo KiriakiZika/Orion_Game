@@ -8,6 +8,7 @@ namespace Dilemma
 {
     public static class ScenePlayer
     {
+        //DESERIALIZER
         public static void PlayScene(ScenePack pack, int sceneIndex)
         {
             if (sceneIndex >= pack.Scenes.Count)
@@ -22,9 +23,9 @@ namespace Dilemma
             Console.WriteLine($"🎬 Scene {scene.Scene_id} | Background: {background}");
 
             // Display characters, dialogue, etc.
-            foreach (var c in scene.Characters)
+            /*foreach (var c in scene.Characters)
                 foreach (var kvp in c)
-                    Console.WriteLine($"🧍 {kvp.Key} → {kvp.Value}");
+                    Console.WriteLine($"🧍 {kvp.Key} → {kvp.Value}");*/
 
             if (scene.Choices == null || scene.Choices.Count == 0)
             {

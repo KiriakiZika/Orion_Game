@@ -10,5 +10,7 @@ namespace Dilemma
     {
         void Show();
         void Close();
+
+        void StartGame();
     }
 }

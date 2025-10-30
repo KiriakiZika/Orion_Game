@@ -204,7 +204,7 @@ namespace Dilemma
             //Temp array of images
             if (charFiles == null || charFiles.Length == 0)
             {
-                charFiles = new string[] { "choso.png", "lawliet.png", "choso.png", "lawliet.png" };
+                charFiles = new string[] { "choso.png", "choso.png" };
             }
 
             for (int i = 0; i < charFiles.Length; i++)
@@ -355,9 +355,10 @@ namespace Dilemma
 
         //////////////////////////////////////////////////////
         //GAME COMPONENTS
-        private void StartGame()
+        public void StartGame()
         {
-            SetGUI(charFiles: new string[] { "choso.png","choso.png" });
+            //SetGUI(charFiles: new string[] { "choso.png","choso.png" });
+            ScenePackBuilder.SaveScenePack(ScenePackBuilder.CreateSampleScenePack(), "pack1.json");
         }
     }
 }
