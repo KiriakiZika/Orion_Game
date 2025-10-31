@@ -14,6 +14,7 @@ namespace Dilemma
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] //can be null
         public string Background_image { get; set; } //override scenepack background, use this
 
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] //can be null
         public List<string> Characters { get; set; } //character images
         public string Dialogue { get; set; } //dialogue text
 

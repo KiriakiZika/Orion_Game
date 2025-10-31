@@ -10,6 +10,7 @@ namespace Dilemma
     {
         public int Scenepack_id { get; set; } //scenepack identifier
         public string Background_image { get; set; } //default background for scenes in this pack
+        public List<string> Characters { get; set; } //character images
         public List<Scene> Scenes { get; set; } = new List<Scene>(); //list of scenes in this pack
     }
 }

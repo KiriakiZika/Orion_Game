@@ -25,10 +25,11 @@ namespace Dilemma
         //UI Components
         private Grid mainGrid;
         private IPalette p = new Palette();
+        private ScenePlayer sp;
 
         //Game Components
         //List<Grid> characters = new List<Grid>();
-        public MainWin(string[] charFiles = null, string[] buttonContents = null, string text=null)
+        public MainWin(string background_image = "error.jpg", string[] charFiles = null, string[] buttonContents = null, string text=null)
         {
             //Event Listeners for window
             this.SizeChanged += Window_SizeChanged;
@@ -44,7 +45,7 @@ namespace Dilemma
                 this.Title = "ORION";
                 this.WindowState = WindowState.Maximized;
                 //
-                SetGUI();
+                SetGUI(background_image,charFiles,buttonContents,text);
             }
             catch (Exception ex)
             {
@@ -54,6 +55,7 @@ namespace Dilemma
             //Game start
             try 
             {
+                sp = new ScenePlayer(this);
                 StartGame();
             }
             catch (Exception ex)
@@ -95,7 +97,7 @@ namespace Dilemma
             // Try loading main image
             try
             {
-                string path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"imgs/{imageName}");
+                string path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, imageName);
                 BitmapImage bitmap = new BitmapImage(new Uri(path, UriKind.Absolute));
                 bgImage.Source = bitmap;
 
@@ -126,7 +128,7 @@ namespace Dilemma
 
         //////////////////////////////////////////////////////
         //UI COMPONENTS
-        public void SetGUI(string[] charFiles = null, string[] buttonContents = null, string text = null) 
+        public void SetGUI(string background_image, string[] charFiles = null, string[] buttonContents = null, string text = null) 
         {
             Grid motherGrid = new Grid();
             motherGrid.ColumnDefinitions.Clear();
@@ -134,7 +136,7 @@ namespace Dilemma
             motherGrid.Children.Clear();
 
             //BACKGROUND IMAGE
-            Grid background = TryToLoadImage("background.jpg");
+            Grid background = TryToLoadImage(background_image);
             motherGrid.Children.Add(background);
             
             //Clear previous mainGrid content (if any) + new instance
@@ -193,7 +195,7 @@ namespace Dilemma
             // --- Assign content ---
             this.Content = mainGrid;
         }
-        //Characters
+        //CHARACTERS
         private Grid SetCharacters(string[] charFiles = null)
         {
             Grid container = new Grid();
@@ -204,7 +206,7 @@ namespace Dilemma
             //Temp array of images
             if (charFiles == null || charFiles.Length == 0)
             {
-                charFiles = new string[] { "choso.png", "choso.png" };
+                charFiles = new string[] { "imgs/choso.png", "imgs/choso.png" };
             }
 
             for (int i = 0; i < charFiles.Length; i++)
@@ -285,7 +287,6 @@ namespace Dilemma
             }
             return container;
         }
-
         //DIALOGUE BOX
         private void SetDialogueBubble(string text)
         {
@@ -357,8 +358,60 @@ namespace Dilemma
         //GAME COMPONENTS
         public void StartGame()
         {
-            //SetGUI(charFiles: new string[] { "choso.png","choso.png" });
-            ScenePackBuilder.SaveScenePack(ScenePackBuilder.CreateSampleScenePack(), "pack1.json");
+            MakeScenePacks();
+
+            //Load scenepack 1
+            sp.Play(1);
+        }
+        private void MakeScenePacks()
+        {
+            //default procedure
+
+            int scenepack_id = 1;
+            string background_image = "classroom.png";
+            List<string> characters = new List<string> { "choso.png", "lawliet.png" };
+
+            //-----------1-----------
+            //Create Choices (if any)
+            Choice c1 = new Choice
+            {
+                Choice_id = 1,
+                Text = "Go left",
+                Outcome = "pack2.json"
+            };
+            Choice c2 = new Choice
+            {
+                Choice_id = 2,
+                Text = "Go right",
+                Outcome = "pack3.json"
+            };
+
+            //-----------2-----------
+            //Create Scene without choices, default background and default characters
+            Scene scene1 = new Scene 
+            {
+                Scene_id = scenepack_id*100 + 1,
+                Dialogue = "You are in a forest."
+            };
+
+            //Create Scene with choices, custom background and custom characters
+            Scene scene2 = new Scene
+            {
+                Scene_id = scenepack_id * 100 + 2,
+                Background_image = "fork.png",
+                Characters = new List<string> { "choso.png" },
+                Dialogue = "Which way do you go?",
+                Choices = new List<Choice> { c1, c2 }
+            };
+            //Note: don't make a scene after one with choices, because it won't ever play
+
+            //-----------3-----------
+            List<Scene> scenes = new List<Scene>();
+            //Add all scenes to a list
+            scenes.Add(scene1);
+            scenes.Add(scene2);
+
+            ScenePackBuilder.CreateCostumScenePack(scenepack_id, background_image, characters, scenes);
         }
     }
 }

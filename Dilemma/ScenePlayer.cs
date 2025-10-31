@@ -1,15 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Shapes;
 
 namespace Dilemma
 {
-    public static class ScenePlayer
+    public class ScenePlayer
     {
+        MainWin mw;
+        public ScenePlayer(MainWin mainWin)
+        {
+            mw = mainWin;
+        }
+
         //DESERIALIZER
-        public static void PlayScene(ScenePack pack, int sceneIndex)
+        public void Play(int scenePack_id)
+        {
+            string fileName = "packs/" + "pack" + scenePack_id + ".json";
+            string packsDir = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "packs");
+            string imgsDir = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "imgs");
+
+            if (!File.Exists(fileName))
+            {
+                new ErrorHandler(false,"No such file exists");
+            }
+
+            // Read JSON synchronously
+            string json = File.ReadAllText(fileName);
+            // Deserialize JSON
+            ScenePack pack = JsonSerializer.Deserialize<ScenePack>(json);
+
+            if (pack == null)
+            {
+                new ErrorHandler(false, "Failed to deserealize");
+            }
+            if (pack.Scenepack_id != scenePack_id)
+            {
+                new ErrorHandler(false,"Scenepack id isn't the same as requested");
+            }
+
+            //Load static assets like background and characters
+            string backgroundPath = System.IO.Path.Combine(imgsDir, pack.Background_image);
+            string[] charFiles = new string[pack.Characters.Count];
+            foreach (var ch in pack.Characters)
+            {
+                string charPath = System.IO.Path.Combine(imgsDir, ch);
+                charFiles[pack.Characters.IndexOf(ch)] = charPath;
+            }
+            mw.SetGUI(backgroundPath, charFiles);
+
+            // Start playing from the first scene
+
+        }
+        public void PlayScene(ScenePack pack, int sceneIndex)
         {
             if (sceneIndex >= pack.Scenes.Count)
             {
