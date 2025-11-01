@@ -24,7 +24,7 @@ namespace Dilemma
         {
             //For main testing
             _mainWin.Show();
-            
+
             //CORRECT
             /*IsFinished = false;
             _startWin.Show();*/

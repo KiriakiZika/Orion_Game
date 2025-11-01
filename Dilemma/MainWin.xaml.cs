@@ -130,6 +130,7 @@ namespace Dilemma
         //UI COMPONENTS
         public void SetGUI(string background_image, string[] charFiles = null, string[] buttonContents = null, string text = null) 
         {
+            //Clear previous motherGrid content (if any)
             Grid motherGrid = new Grid();
             motherGrid.ColumnDefinitions.Clear();
             motherGrid.RowDefinitions.Clear();
@@ -139,19 +140,16 @@ namespace Dilemma
             Grid background = TryToLoadImage(background_image);
             motherGrid.Children.Add(background);
             
+
             //Clear previous mainGrid content (if any) + new instance
-            mainGrid = new Grid();
+            mainGrid = new Grid() { Margin = new Thickness(0) };
             mainGrid.ColumnDefinitions.Clear();
             mainGrid.RowDefinitions.Clear();
             mainGrid.Children.Clear();
             motherGrid.Children.Add(mainGrid);
 
-            // Define two rows: top for Label, rest for content
-            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(2, GridUnitType.Star) }); // label row
-            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // content row
-
-            // First row
-            FillRow1(charFiles, buttonContents);
+            //CHARACTERS
+            FillMainGrid(charFiles, buttonContents);
             //Second row
             SetDialogueBubble(text);
 
@@ -159,19 +157,19 @@ namespace Dilemma
         }
 
         //IMAGE AND CHOICE PANEL
-        private void FillRow1(string[] charFiles = null, string[] buttonContents = null)
+        private void FillMainGrid(string[] charFiles = null, string[] buttonContents = null)
         {
-            Grid row1 = new Grid() { Margin = new Thickness(0) };
-            row1.ColumnDefinitions.Clear();
-            row1.RowDefinitions.Clear();
-            row1.Children.Clear();
+            Grid char_choices_layer = new Grid() { Margin = new Thickness(0) };
+            char_choices_layer.ColumnDefinitions.Clear();
+            char_choices_layer.RowDefinitions.Clear();
+            char_choices_layer.Children.Clear();
 
             // Define two columns: left for image, right for choices
-            row1.ColumnDefinitions.Add(new ColumnDefinition
+            char_choices_layer.ColumnDefinitions.Add(new ColumnDefinition
             {
                 Width = new GridLength(2, GridUnitType.Star)
             });
-            row1.ColumnDefinitions.Add(new ColumnDefinition
+            char_choices_layer.ColumnDefinitions.Add(new ColumnDefinition
             {
                 Width = new GridLength(1, GridUnitType.Star)
             });
@@ -185,12 +183,11 @@ namespace Dilemma
             // Add panels to the grid
             Grid.SetColumn(characterImage, 0);
             Grid.SetColumn(choiceGrid, 1);
-            row1.Children.Add(characterImage);
-            row1.Children.Add(choiceGrid);
+            char_choices_layer.Children.Add(characterImage);
+            char_choices_layer.Children.Add(choiceGrid);
 
-            // Add row1 grid to maingrid
-            Grid.SetRow(row1, 0);
-            mainGrid.Children.Add(row1);
+            // Add layer to maingrid
+            mainGrid.Children.Add(char_choices_layer);
 
             // --- Assign content ---
             this.Content = mainGrid;
@@ -300,10 +297,10 @@ namespace Dilemma
         //DIALOGUE BOX
         private void SetDialogueBubble(string text)
         {
-            Grid row2 = new Grid();
-            row2.ColumnDefinitions.Clear();
-            row2.RowDefinitions.Clear();
-            row2.Children.Clear();
+            Grid dialogue_layer = new Grid();
+            dialogue_layer.ColumnDefinitions.Clear();
+            dialogue_layer.RowDefinitions.Clear();
+            dialogue_layer.Children.Clear();
 
             // Create textbox for dialogue, description and thoughts
             TextBox dialogueBox = new TextBox()
@@ -311,14 +308,17 @@ namespace Dilemma
                 //text controls
                 Text = "Text couldn't load.",
                 FontFamily = new FontFamily("Reem Kufi"),
-                FontSize = 20,
+                FontSize = 30,
                 Padding = new Thickness(15), //how indented the text is inside dialogueBox
                 Foreground = p.GetColour("DarkBrown"),
                 //textbox controls
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                Height = SystemParameters.PrimaryScreenHeight / 4,
                 IsEnabled = false,
                 BorderBrush = p.GetColour("DarkBrown"),
                 BorderThickness = new Thickness(10),
-                Background = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)), // 128 = 50% opacity
+                Background = new SolidColorBrush(Color.FromArgb(230, 255, 255, 255)), // 128 = 50% opacity
                 IsReadOnly = true,
                 Margin = new Thickness(10) //how indented the dialogueBox is inside parent (row 2)
             };
@@ -326,14 +326,14 @@ namespace Dilemma
             {
                 dialogueBox.Text = text;
             }
-            row2.Children.Add(dialogueBox);
+            dialogue_layer.Children.Add(dialogueBox);
 
             // Continue Button
             Button continueButton = new Button
             {
                 Content = ">>>",
                 FontFamily = new FontFamily("Reem Kufi"),
-                FontSize = 20,
+                FontSize = 40,
                 Foreground = p.GetColour("Champagne"),
                 Background = Brushes.Transparent,
                 //extra border
@@ -345,11 +345,10 @@ namespace Dilemma
                 VerticalAlignment = VerticalAlignment.Bottom
             };
             continueButton.Click += ContinueButtonClicked;
-            row2.Children.Add(continueButton);
+            dialogue_layer.Children.Add(continueButton);
 
-            // Add row2 to maingrid
-            Grid.SetRow(row2, 1);
-            mainGrid.Children.Add(row2);
+            // Add dialogue_layer to maingrid
+            mainGrid.Children.Add(dialogue_layer);
 
             // --- Assign content ---
             this.Content = mainGrid;
