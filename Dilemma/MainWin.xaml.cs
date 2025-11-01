@@ -235,23 +235,27 @@ namespace Dilemma
             }
 
             // Create container Grid
-            Grid container = new Grid() { Margin = new Thickness(10) };
+            Grid container = new Grid()
+            {
+                Margin = new Thickness(10)
+            };
             container.ColumnDefinitions.Clear();
             container.RowDefinitions.Clear();
             container.Children.Clear();
-
-            // Add a single row that fills the Grid
-            container.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
             if (buttonContents == null || buttonContents.Length == 0)
             {
                 return container;
             }
 
-            // Create a nested Grid to hold buttons vertically
+            // Split container vertically into 2 rows
+            container.RowDefinitions.Add(new RowDefinition { Height = new GridLength(2.5, GridUnitType.Star) }); // top spacing
+            container.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // buttons
+
+            // Create a nested Grid to hold buttons
             Grid buttonGrid = new Grid
             {
-                VerticalAlignment = VerticalAlignment.Center, // <-- centers the buttons
+                VerticalAlignment = VerticalAlignment.Bottom, // inside its row
                 HorizontalAlignment = HorizontalAlignment.Stretch
             };
 
@@ -273,25 +277,16 @@ namespace Dilemma
                     Background = p.GetColour("Mountain"),
                     Foreground = p.GetColour("Champagne"),
                     VerticalAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Center
+                    HorizontalAlignment = HorizontalAlignment.Stretch
                 };
                 Grid.SetRow(cb, i);
                 buttonGrid.Children.Add(cb);
                 buttons[i] = cb;
             }
+            // Place buttonGrid in the second row (middle row)
+            Grid.SetRow(buttonGrid, 0);
             container.Children.Add(buttonGrid);
 
-            // Force layout update to get ActualWidth
-            buttonGrid.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-            buttonGrid.Arrange(new Rect(buttonGrid.DesiredSize));
-
-            // Find the widest button
-            double maxWidth = buttons.Max(b => b.ActualWidth);
-            // Set all buttons to the same width
-            foreach (var b in buttons)
-            {
-                b.Width = maxWidth;
-            }
             return container;
         }
         //DIALOGUE BOX
