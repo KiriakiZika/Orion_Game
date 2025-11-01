@@ -12,8 +12,10 @@ namespace Dilemma
 {
     public class ChoiceButton : Button
     {
-        public ChoiceButton()
+        MainWin mw;
+        public ChoiceButton(MainWin mw)
         {
+            this.mw = mw;
             //Event handlers
             Click += CbClick;
             MouseEnter += CbHover;
@@ -21,7 +23,19 @@ namespace Dilemma
 
         public void CbClick(object sender, EventArgs e)
         {
-            MessageBox.Show("Button clicked!");
+            //Check sender type
+            var btn = sender as ChoiceButton;
+            if (btn == null)
+            {
+                return;
+            }
+
+            //send id of selected choice
+            mw.sp.AllowContinue((int)btn.Tag);
+
+            // Move focus to the window
+            mw.Focus();  // set logical focus to the window
+            FocusManager.SetFocusedElement(mw, mw);
         }
         public void CbHover(object sender, EventArgs e)
         {

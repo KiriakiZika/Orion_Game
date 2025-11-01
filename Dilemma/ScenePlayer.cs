@@ -6,6 +6,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
 
@@ -14,21 +15,42 @@ namespace Dilemma
     public class ScenePlayer
     {
         MainWin mw;
+
+        // Custom EventArgs to pass selected choice ID
+        public class ContinueEventArgs : EventArgs
+        {
+            public int SelectedChoiceId { get; private set; }
+
+            public ContinueEventArgs(int selectedChoiceId)
+            {
+                SelectedChoiceId = selectedChoiceId;
+            }
+        }
+        
+        // The main window will subscribe to this event.
+        public event EventHandler<ContinueEventArgs> CanContinueChanged;
+
+
         public ScenePlayer(MainWin mainWin)
         {
             mw = mainWin;
         }
 
-        //DESERIALIZER
-        public void Play(int scenePack_id)
+        public void Play()
         {
-            string fileName = "packs/" + "pack" + scenePack_id + ".json";
-            string packsDir = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "packs");
-            string imgsDir = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "imgs");
+            PlayPack(1);
+        }
 
+        //DESERIALIZER
+        private async void PlayPack(int sp_id)
+        {
+            string fileName = "packs/" + "pack" + sp_id + ".json";
+            
             if (!File.Exists(fileName))
             {
-                new ErrorHandler(false,"No such file exists");
+                MessageBox.Show("Scenepack file not found: " + fileName);
+                Ending();
+                return;
             }
 
             // Read JSON synchronously
@@ -40,57 +62,103 @@ namespace Dilemma
             {
                 new ErrorHandler(false, "Failed to deserealize");
             }
-            if (pack.Scenepack_id != scenePack_id)
+            if (pack.Scenepack_id != sp_id)
             {
                 new ErrorHandler(false,"Scenepack id isn't the same as requested");
             }
 
-            //Load static assets like background and characters
-            string backgroundPath = System.IO.Path.Combine(imgsDir, pack.Background_image);
-            string[] charFiles = new string[pack.Characters.Count];
-            foreach (var ch in pack.Characters)
-            {
-                string charPath = System.IO.Path.Combine(imgsDir, ch);
-                charFiles[pack.Characters.IndexOf(ch)] = charPath;
-            }
-            mw.SetGUI(backgroundPath, charFiles);
-
             // Start playing from the first scene
-
-        }
-        public void PlayScene(ScenePack pack, int sceneIndex)
-        {
-            if (sceneIndex >= pack.Scenes.Count)
+            for (int i = 1; i <= pack.Scenes.Count; i++)
             {
-                Console.WriteLine("➡️ End of pack. Move to next ScenePack.");
+                await PlayScene(pack, i);
+            }
+        }
+        private async Task PlayScene(ScenePack pack, int scene_id)
+        {
+            Scene scene = pack.Scenes[scene_id-1];
+            if (scene == null)
+            {
+                new ErrorHandler(false, "Scene not found in pack");
                 return;
             }
 
-            var scene = pack.Scenes[sceneIndex];
+            //Use scene-specific background and characters if they exist, otherwise use pack defaults
             string background = scene.Background_image ?? pack.Background_image;
+            List<string> characters = scene.Characters ?? pack.Characters;
+            
+            //Get dialogue text and choices
+            string dialogue = scene.Dialogue;
+            string[] choices = scene.Choices?.Select(c => c.Text).ToArray();
 
-            Console.WriteLine($"🎬 Scene {scene.Scene_id} | Background: {background}");
+            UpdateSceneGUI(background, characters, dialogue, choices);
 
-            // Display characters, dialogue, etc.
-            /*foreach (var c in scene.Characters)
-                foreach (var kvp in c)
-                    Console.WriteLine($"🧍 {kvp.Key} → {kvp.Value}");*/
 
-            if (scene.Choices == null || scene.Choices.Count == 0)
+            // Wait for the player to make a choice, and get the ID
+            int selectedChoiceId = await WaitUntilCanContinueAsync();
+
+            //No choices made
+            if (selectedChoiceId == 0) 
             {
-                Console.WriteLine("➡️ No choices — moving to next scene...");
-                PlayScene(pack, sceneIndex + 1);
+                //Last scene in pack, go to next pack
+                if (scene_id >= pack.Scenes.Count)
+                {
+                    PlayPack(pack.Scenepack_id + 1);
+                }
+                return;
             }
-            else
+            else 
             {
-                Console.WriteLine("🪧 Choices:");
-                foreach (var choice in scene.Choices)
-                    Console.WriteLine($"  [{choice.Choice_id}] {choice.Text}");
-
-                // Example: automatically pick the first one for now
-                var chosen = scene.Choices[0];
-                Console.WriteLine($"➡️ Outcome: {chosen.Outcome}");
+                //find id of choice made, go to outcome scenepack
+                Choice selectedChoice = scene.Choices.FirstOrDefault(c => c.Choice_id == selectedChoiceId);
+                PlayPack(selectedChoice.Outcome);
             }
+        }
+
+
+        //MainWin calls this method when player makes a choice
+        public void AllowContinue(int selectedChoice_id)
+        {
+            if (CanContinueChanged != null)
+                CanContinueChanged(this, new ContinueEventArgs(selectedChoice_id));
+        }
+
+        //Waits until MainWin signals that player made a choice
+        private Task<int> WaitUntilCanContinueAsync()
+        {
+            var tcs = new TaskCompletionSource<int>();
+
+            EventHandler<ContinueEventArgs> handler = null;
+            handler = delegate (object sender, ContinueEventArgs e)
+            {
+                tcs.TrySetResult(e.SelectedChoiceId); // pass the selected ID
+                CanContinueChanged -= handler;
+            };
+
+            CanContinueChanged += handler;
+
+            return tcs.Task;
+        }
+
+
+        private void UpdateSceneGUI(string background, List<string> characters, string dialogue, string[] choices = null)
+        {
+            //Directories
+            string imgsDir = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "imgs");
+
+            //Load static assets like background and characters
+            string backgroundPath = System.IO.Path.Combine(imgsDir, background);
+            string[] charFiles = new string[characters.Count];
+            foreach (var ch in characters)
+            {
+                string charPath = System.IO.Path.Combine(imgsDir, ch);
+                charFiles[characters.IndexOf(ch)] = charPath;
+            }
+            mw.SetGUI(backgroundPath, charFiles, choices, dialogue);
+        }
+
+        private void Ending()
+        {
+            //MessageBox.Show("No more scenepacks available. The End.");
         }
     }
 }

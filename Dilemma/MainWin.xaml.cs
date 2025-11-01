@@ -25,11 +25,12 @@ namespace Dilemma
         //UI Components
         private Grid mainGrid;
         private IPalette p = new Palette();
-        private ScenePlayer sp;
+        public ScenePlayer sp;
 
         //Game Components
-        //List<Grid> characters = new List<Grid>();
-        public MainWin(string background_image = "error.jpg", string[] charFiles = null, string[] buttonContents = null, string text=null)
+        List<(int,bool)> choices = new List<(int,bool)>();
+
+        public MainWin(string background_image = "imgs/error.jpg", string[] charFiles = null, string[] buttonContents = null, string text=null)
         {
             //Event Listeners for window
             this.SizeChanged += Window_SizeChanged;
@@ -106,7 +107,6 @@ namespace Dilemma
             // Load error/fallback image (it is in resources)
             catch (Exception)
             {
-
                 TextBox errorPanel = new TextBox()
                 {
                     //text controls
@@ -206,7 +206,7 @@ namespace Dilemma
             //Temp array of images
             if (charFiles == null || charFiles.Length == 0)
             {
-                charFiles = new string[] { "imgs/choso.png", "imgs/choso.png" };
+                charFiles = new string[] { "imgs/undefined.png", "imgs/undefined.png" };
             }
 
             for (int i = 0; i < charFiles.Length; i++)
@@ -228,6 +228,15 @@ namespace Dilemma
         //CHOICE BUTTONS
         private Grid SetChoices(string[] buttonContents = null)
         {
+            //Clear previous content
+            choices.Clear();
+
+            //Add new content
+            for (int i = 0; buttonContents != null && i < buttonContents.Length; i++)
+            {
+                choices.Add((i, false));
+            }
+
             // Create container Grid
             Grid container = new Grid() { Margin = new Thickness(10) };
             container.ColumnDefinitions.Clear();
@@ -239,7 +248,7 @@ namespace Dilemma
 
             if (buttonContents == null || buttonContents.Length == 0)
             {
-                buttonContents = new string[] { "cry","drink coffee","jump off a bridge" };
+                return container;
             }
 
             // Create a nested Grid to hold buttons vertically
@@ -256,8 +265,9 @@ namespace Dilemma
             {
                 buttonGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-                ChoiceButton cb = new ChoiceButton
+                ChoiceButton cb = new ChoiceButton(this)
                 {
+                    Tag = i+1,
                     Content = $"{buttonContents[i]}",
                     FontFamily = new FontFamily("Reem Kufi"),
                     FontSize = 20,
@@ -346,7 +356,8 @@ namespace Dilemma
         }
         private void ContinueButtonClicked(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Next Dialogue Bubble");
+            if (choices.Count > 0) { MessageBox.Show("Please make a choice!"); return; }
+            sp.AllowContinue(0);
 
             // Move focus to the window
             this.Focus();  // set logical focus to the window
@@ -361,7 +372,7 @@ namespace Dilemma
             MakeScenePacks();
 
             //Load scenepack 1
-            sp.Play(1);
+            sp.Play();
         }
         private void MakeScenePacks()
         {
@@ -369,7 +380,7 @@ namespace Dilemma
 
             int scenepack_id = 1;
             string background_image = "classroom.png";
-            List<string> characters = new List<string> { "choso.png", "lawliet.png" };
+            List<string> characters = new List<string> { "g1_neutral.png", "alien_withbeanie.png" };
 
             //-----------1-----------
             //Create Choices (if any)
@@ -377,29 +388,29 @@ namespace Dilemma
             {
                 Choice_id = 1,
                 Text = "Go left",
-                Outcome = "pack2.json"
+                Outcome = 2
             };
             Choice c2 = new Choice
             {
                 Choice_id = 2,
                 Text = "Go right",
-                Outcome = "pack3.json"
+                Outcome = 3
             };
 
             //-----------2-----------
             //Create Scene without choices, default background and default characters
             Scene scene1 = new Scene 
             {
-                Scene_id = scenepack_id*100 + 1,
+                Scene_id = 1,
                 Dialogue = "You are in a forest."
             };
 
             //Create Scene with choices, custom background and custom characters
             Scene scene2 = new Scene
             {
-                Scene_id = scenepack_id * 100 + 2,
-                Background_image = "fork.png",
-                Characters = new List<string> { "choso.png" },
+                Scene_id = 2,
+                Background_image = "hallway.png",
+                Characters = new List<string> { "g1_happy.png", "alien_withoutbeanie.png" },
                 Dialogue = "Which way do you go?",
                 Choices = new List<Choice> { c1, c2 }
             };

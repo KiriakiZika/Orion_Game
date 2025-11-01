@@ -10,6 +10,6 @@ namespace Dilemma
     {
         public int Choice_id { get; set; } //choice identifier
         public string Text { get; set; } //displayed choice text
-        public string Outcome { get; set; } //JSON filename
+        public int Outcome { get; set; } //JSON filename
     }
 }
