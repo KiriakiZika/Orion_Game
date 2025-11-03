@@ -82,7 +82,7 @@ namespace Dilemma
                 ContinueButtonClicked(sender, e);
             }
         }
-        private Grid TryToLoadImage(string imageName)
+        private Grid TryToLoadImage(string imageName, bool isBackground = true)
         {
             //will carry the results
             Grid container = new Grid();
@@ -94,6 +94,10 @@ namespace Dilemma
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center
             };
+            if (!isBackground)
+            {
+                bgImage.Stretch = Stretch.Uniform;
+            }
 
             // Try loading main image
             try
@@ -159,7 +163,7 @@ namespace Dilemma
         //IMAGE AND CHOICE PANEL
         private void FillMainGrid(string[] charFiles = null, string[] buttonContents = null)
         {
-            Grid char_choices_layer = new Grid() { Margin = new Thickness(0) };
+            Grid char_choices_layer = new Grid();
             char_choices_layer.ColumnDefinitions.Clear();
             char_choices_layer.RowDefinitions.Clear();
             char_choices_layer.Children.Clear();
@@ -200,6 +204,23 @@ namespace Dilemma
             container.RowDefinitions.Clear();
             container.Children.Clear();
 
+            container.RowDefinitions.Add(new RowDefinition
+            {
+                Height = new GridLength(3, GridUnitType.Star)
+            });
+            container.RowDefinitions.Add(new RowDefinition
+            {
+                Height = new GridLength(1, GridUnitType.Star)
+            });
+            
+            //container for characters - 3/4 of screen top
+            Grid charsGrid = new Grid();
+            charsGrid.ColumnDefinitions.Clear();
+            charsGrid.RowDefinitions.Clear();
+            charsGrid.Children.Clear();
+            Grid.SetRow(charsGrid, 0);
+            container.Children.Add(charsGrid);
+
             //Temp array of images
             if (charFiles == null || charFiles.Length == 0)
             {
@@ -209,15 +230,16 @@ namespace Dilemma
             for (int i = 0; i < charFiles.Length; i++)
             {
                 // Add a new column
-                container.ColumnDefinitions.Add(new ColumnDefinition
+                charsGrid.ColumnDefinitions.Add(new ColumnDefinition
                 {
                     Width = new GridLength(1, GridUnitType.Star)
                 });
 
                 // Load and add image=character to the column
-                Grid character = TryToLoadImage(charFiles[i]);
+                Grid character = TryToLoadImage(charFiles[i], false);
+                character.VerticalAlignment = VerticalAlignment.Bottom;
                 Grid.SetColumn(character, i);
-                container.Children.Add(character);
+                charsGrid.Children.Add(character);
             }
 
             return container;
@@ -367,7 +389,7 @@ namespace Dilemma
         public void StartGame()
         {
             //Create scenepacks
-            MakeScenePack();
+            //MakeScenePack();
 
             //Load scenepacks
             sp.Play();
@@ -376,22 +398,22 @@ namespace Dilemma
         {
             //default procedure
 
-            int scenepack_id = 1;
-            string background_image = "classroom.png";
-            List<string> characters = new List<string> { "g1_neutral.png", "g1_neutral.png" };
+            int scenepack_id = 2;
+            string background_image = "hallway.png";
+            List<string> characters = new List<string> { "g1_confused.png", "g1_confused.png", "g1_happy.png" };
 
             //-----------1-----------
             //Create Choices (if any)
             Choice c1 = new Choice
             {
                 Choice_id = 1,
-                Text = "Risk it all for character development.",
+                Text = "Talk to the new kid.",
                 Outcome = 2
             };
             Choice c2 = new Choice
             {
                 Choice_id = 2,
-                Text = "Stay safe and let natural selection work.",
+                Text = "Re-do your math homework.",
                 //Pretend you didn’t see anything and walk away slowly.
                 //Nope. That sounds like a “him” problem.
                 Outcome = 3
@@ -406,12 +428,27 @@ namespace Dilemma
             //for ease, use a list for text
             List<string> dialogues = new List<string>
             {
-                "Annie: Well, that was weird.",
-                "Mads: Eh, a weird guy munching on a sweater. I've seen worse.",
-                "Annie: You're right. Let's go to class.",
-                "Mads: Wait. See that? That's the weird guy from the park.",
-                "Annie: What is Jessica doing with him?",
-                "Mads: She seems to be bothering him. We should go help him."
+                "Annie: Okay, let's risk it all to help him.",
+                "*The girls walk over to Jessica, trembling.*",
+                "Mads: Hey, Jessica.",
+                "Annie: Stop bothering him, okay?",
+                "Jessica: Well, well, well. You think you can be heroes?",
+                "Mads: We just… thought you should stop picking on him.",
+"Jessica: Aw, that’s adorable. You thought you could stop me?",
+"*Jessica’s friends snicker behind her. The new kid stares at the ground.*",
+"Annie: Leave him alone, Jessica. Seriously.",
+"Jessica: Or what? You’ll write me a strongly worded text?",
+"*She steps closer, towering over Annie.*",
+"Mads: (muttering) This was a terrible idea.",
+"Jessica grabs Annie’s notebook and flips through it mockingly.",
+"Jessica: Wow, all these numbers. You must be a genius.",
+"Annie: Give it back! That's my homework!",
+"*Jessica tosses it into the ground. The girls freeze.*",
+"Jessica: Oops. Guess I’m clumsy.",
+"*The laughter from Jessica’s group echoes down the hall as they walk away.*",
+"Annie: (quietly) We tried to help…",
+"Mads: Yeah. And we just made it worse.",
+"Annie: What do we do now?"
             };
 
             //Create all scenes automatically and add to the list
@@ -423,10 +460,10 @@ namespace Dilemma
                     Scene_id = i + 1,
                     Dialogue = dialogues[i]
                 };
-                if (i == 4 || i == 5)
+                /*if (i == 4 || i == 5)
                 {
                     scene.Background_image = "hallway.png";
-                }
+                }*/
                 scenes.Add(scene);
             }
 
@@ -434,9 +471,8 @@ namespace Dilemma
             Scene sceneLast = new Scene
             {
                 Scene_id = i+1,
-                Background_image = "hallway.png",
-                Characters = new List<string> { "g1_confused.png", "g1_neutral.png" },
-                Dialogue = "Annie: Are you sure?",
+                Characters = new List<string> { "g1_neutral.png", "g1_neutral.png", "alien_withbeanie.png" },
+                Dialogue = "Annie: I vote we get a ticket out of the country...",
                 Choices = new List<Choice> { c1, c2 }
             };
             scenes.Add(sceneLast);

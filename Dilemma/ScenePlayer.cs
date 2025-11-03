@@ -38,7 +38,8 @@ namespace Dilemma
 
         public void Play()
         {
-            PlayPack(1);
+            int starterPack = 1;
+            PlayPack(starterPack);
         }
 
         //DESERIALIZER
