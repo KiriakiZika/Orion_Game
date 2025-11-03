@@ -16,9 +16,10 @@ namespace Dilemma
 {
     public class ScenePlayer
     {
-        MainWin mw;
-        ScenePack currentPack = null;
-        Scene currentScene = null;
+        private MainWin mw;
+        private readonly int starterPack_index = 1;
+        private ScenePack currentPack = null;
+        private Scene currentScene = null;
 
         // Custom EventArgs to pass selected choice ID
         public class ContinueEventArgs : EventArgs
@@ -42,21 +43,24 @@ namespace Dilemma
             mw = mainWin;
         }
 
-        public void Play()
+        public async Task Play()
         {
-            int starterPack_index = 1;
-            PlayPack(starterPack_index);
+            await PlayPack(starterPack_index);
         }
 
         //DESERIALIZER
-        private async void PlayPack(int sp_id)
+        private async Task PlayPack(int sp_id)
         {
             string fileName = "packs/" + "pack" + sp_id + ".json";
             
+            if (sp_id<starterPack_index)
+            {
+                await Play();
+                return;
+            }
+
             if (!File.Exists(fileName))
             {
-                MessageBox.Show("Scenepack file not found: " + fileName);
-                Ending();
                 return;
             }
 
@@ -83,6 +87,11 @@ namespace Dilemma
         }
         private async Task PlayScene(ScenePack pack, int scene_id, CancellationToken token)
         {
+            if (scene_id < 1)
+            {
+                GoToPreviousPack();
+                return;
+            }
             Scene scene = pack.Scenes[scene_id-1];
             if (scene == null)
             {
@@ -90,7 +99,7 @@ namespace Dilemma
                 return;
             }
             currentScene = scene;
-            MessageBox.Show("Playing Scene " + scene.Scene_id);
+            MessageBox.Show($"Playing Scene {scene.Scene_id} from Pack {pack.Scenepack_id}");
 
             //Use scene-specific background and characters if they exist, otherwise use pack defaults
             string background = scene.Background_image ?? pack.Background_image;
@@ -118,7 +127,7 @@ namespace Dilemma
                     //Last scene in pack, next pack
                     else
                     {
-                        PlayPack(pack.Scenepack_id + 1);
+                        await PlayPack(pack.Scenepack_id + 1);
                     }
                     return;
                 }
@@ -126,7 +135,7 @@ namespace Dilemma
                 {
                     //find id of choice made, go to outcome scenepack
                     Choice selectedChoice = scene.Choices.FirstOrDefault(c => c.Choice_id == selectedChoiceId);
-                    PlayPack(selectedChoice.Outcome);
+                    await PlayPack(selectedChoice.Outcome);
                 }
             }
             catch (TaskCanceledException)
@@ -169,7 +178,6 @@ namespace Dilemma
         }
 
 
-
         //Other functionality
         public async Task SkipToLastScene()
         {
@@ -181,6 +189,32 @@ namespace Dilemma
 
             // Start last scene with new token
             await PlayScene(currentPack, currentPack.Scenes.Count, sceneCts.Token);
+        }
+
+        public async void GoToPreviousScene()
+        {
+            // Cancel all currently waiting scenes
+            sceneCts?.Cancel();
+            
+            // Create a new token for the previous scene
+            sceneCts = new CancellationTokenSource();
+
+            // Start previous scene with new token
+            int previousSceneIndex = currentScene.Scene_id - 1;
+            await PlayScene(currentPack, previousSceneIndex, sceneCts.Token);
+        }
+
+        public async void GoToPreviousPack()
+        {
+            // Cancel all currently waiting scenes
+            sceneCts?.Cancel();
+
+            // Create a new token for the previous pack
+            sceneCts = new CancellationTokenSource();
+
+            // Start previous pack with new token
+            int previousPackIndex = currentPack.Scenepack_id - 1;
+            await PlayPack(previousPackIndex);
         }
 
 

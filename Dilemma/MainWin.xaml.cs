@@ -346,8 +346,7 @@ namespace Dilemma
             dialogue_layer.Children.Add(dialogueBox);
 
             // Continue Button, only if no choices
-            if (noChoices)
-            {
+            
                 //stack so buttons don't overlap
                 StackPanel buttonPanel = new StackPanel()
                 {
@@ -356,18 +355,38 @@ namespace Dilemma
                     Margin = new Thickness(10)
                 };
 
-                Button skipButton = new Button
+                Button backButton = new Button
                 {
-                    Content = "SKIP",
+                    Content = "BACK",
                     FontFamily = new FontFamily("Reem Kufi"),
-                    FontSize = 40,
+                    FontSize = 30,
                     Foreground = p.GetColour("DarkBrown"),
                     Background = Brushes.Transparent,
                     //extra border
                     BorderBrush = p.GetColour("DarkBrown"),
                     BorderThickness = new Thickness(2),
                     Padding = new Thickness(5),
-                    Margin = new Thickness(35),
+                    Margin = new Thickness(10, 15, 20, 15),
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment = VerticalAlignment.Bottom
+                };
+                backButton.Click += backButtonClicked;
+                buttonPanel.Children.Add(backButton);
+
+            if (noChoices)
+            {
+                Button skipButton = new Button
+                {
+                    Content = "SKIP",
+                    FontFamily = new FontFamily("Reem Kufi"),
+                    FontSize = 30,
+                    Foreground = p.GetColour("DarkBrown"),
+                    Background = Brushes.Transparent,
+                    //extra border
+                    BorderBrush = p.GetColour("DarkBrown"),
+                    BorderThickness = new Thickness(2),
+                    Padding = new Thickness(5),
+                    Margin = new Thickness(0, 15, 10, 15),
                     HorizontalAlignment = HorizontalAlignment.Right,
                     VerticalAlignment = VerticalAlignment.Bottom
                 };
@@ -379,22 +398,21 @@ namespace Dilemma
                 {
                     Content = ">>>",
                     FontFamily = new FontFamily("Reem Kufi"),
-                    FontSize = 40,
+                    FontSize = 30,
                     Foreground = p.GetColour("DarkBrown"),
                     Background = Brushes.Transparent,
                     //extra border
                     BorderBrush = p.GetColour("DarkBrown"),
                     BorderThickness = new Thickness(2),
                     Padding = new Thickness(5),
-                    Margin = new Thickness(35),
+                    Margin = new Thickness(10,15,20,15),
                     HorizontalAlignment = HorizontalAlignment.Right,
                     VerticalAlignment = VerticalAlignment.Bottom
                 };
                 continueButton.Click += ContinueButtonClicked;
                 buttonPanel.Children.Add(continueButton);
-                
-                dialogue_layer.Children.Add(buttonPanel);
             }
+            dialogue_layer.Children.Add(buttonPanel);
 
             // Add dialogue_layer to maingrid
             mainGrid.Children.Add(dialogue_layer);
@@ -402,6 +420,8 @@ namespace Dilemma
             // --- Assign content ---
             this.Content = mainGrid;
         }
+
+        //Button Event Handlers
         private void ContinueButtonClicked(object sender, RoutedEventArgs e)
         {
             sp.AllowContinue(0);
@@ -418,7 +438,14 @@ namespace Dilemma
             this.Focus();  // set logical focus to the window
             FocusManager.SetFocusedElement(this, this);
         }
+        private void backButtonClicked(object sender, RoutedEventArgs e)
+        {
+            sp.GoToPreviousScene();
 
+            // Move focus to the window
+            this.Focus();  // set logical focus to the window
+            FocusManager.SetFocusedElement(this, this);
+        }
 
         //////////////////////////////////////////////////////
         //GAME COMPONENTS
