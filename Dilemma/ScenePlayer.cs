@@ -99,7 +99,7 @@ namespace Dilemma
                 return;
             }
             currentScene = scene;
-            MessageBox.Show($"Playing Scene {scene.Scene_id} from Pack {pack.Scenepack_id}");
+            //MessageBox.Show($"Playing Scene {scene.Scene_id} from Pack {pack.Scenepack_id}");
 
             //Use scene-specific background and characters if they exist, otherwise use pack defaults
             string background = scene.Background_image ?? pack.Background_image;
@@ -188,7 +188,13 @@ namespace Dilemma
             sceneCts = new CancellationTokenSource();
 
             // Start last scene with new token
-            await PlayScene(currentPack, currentPack.Scenes.Count, sceneCts.Token);
+            if (currentPack != null) {
+                await PlayScene(currentPack, currentPack.Scenes.Count, sceneCts.Token);
+            }else 
+            {
+                ErrorHandler er = new ErrorHandler(false, "Couldn't load scenes.");
+                er.ShowError();
+            }
         }
 
         public async void GoToPreviousScene()
@@ -200,8 +206,16 @@ namespace Dilemma
             sceneCts = new CancellationTokenSource();
 
             // Start previous scene with new token
-            int previousSceneIndex = currentScene.Scene_id - 1;
-            await PlayScene(currentPack, previousSceneIndex, sceneCts.Token);
+            if (currentPack!=null && currentScene!=null)
+            {
+                int previousSceneIndex = currentScene.Scene_id - 1;
+                await PlayScene(currentPack, previousSceneIndex, sceneCts.Token);
+            }
+            else if(currentPack==null || currentScene==null)
+            { 
+                ErrorHandler er = new ErrorHandler(false, "Couldn't load scenes.");
+                er.ShowError();
+            }
         }
 
         public async void GoToPreviousPack()

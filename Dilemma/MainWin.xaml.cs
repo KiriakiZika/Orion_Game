@@ -452,7 +452,7 @@ namespace Dilemma
         public void StartGame()
         {
             //Create scenepacks
-            //MakeScenePack();
+            MakeScenePack();
 
             //Load scenepacks
             sp.Play();
@@ -461,17 +461,17 @@ namespace Dilemma
         {
             //default procedure
 
-            int scenepack_id = 2;
+            int scenepack_id = 4;
             string background_image = "hallway.png";
-            List<string> characters = new List<string> { "g1_confused.png", "g1_confused.png", "g1_happy.png" };
+            List<string> characters = new List<string> { "g1_neutral.png", "g1_neutral.png", "alien_withbeanie.png" };
 
             //-----------1-----------
             //Create Choices (if any)
             Choice c1 = new Choice
             {
                 Choice_id = 1,
-                Text = "Talk to the new kid.",
-                Outcome = 2
+                Text = "Go home.",
+                Outcome = 5
             };
             Choice c2 = new Choice
             {
@@ -491,27 +491,9 @@ namespace Dilemma
             //for ease, use a list for text
             List<string> dialogues = new List<string>
             {
-                "Annie: Okay, let's risk it all to help him.",
-                "*The girls walk over to Jessica, trembling.*",
-                "Mads: Hey, Jessica.",
-                "Annie: Stop bothering him, okay?",
-                "Jessica: Well, well, well. You think you can be heroes?",
-                "Mads: We just… thought you should stop picking on him.",
-"Jessica: Aw, that’s adorable. You thought you could stop me?",
-"*Jessica’s friends snicker behind her. The new kid stares at the ground.*",
-"Annie: Leave him alone, Jessica. Seriously.",
-"Jessica: Or what? You’ll write me a strongly worded text?",
-"*She steps closer, towering over Annie.*",
-"Mads: (muttering) This was a terrible idea.",
-"Jessica grabs Annie’s notebook and flips through it mockingly.",
-"Jessica: Wow, all these numbers. You must be a genius.",
-"Annie: Give it back! That's my homework!",
-"*Jessica tosses it into the ground. The girls freeze.*",
-"Jessica: Oops. Guess I’m clumsy.",
-"*The laughter from Jessica’s group echoes down the hall as they walk away.*",
-"Annie: (quietly) We tried to help…",
-"Mads: Yeah. And we just made it worse.",
-"Annie: What do we do now?"
+                "Annie: Blah.",
+                "Mads: Blah.",
+                "New kid: Blah."
             };
 
             //Create all scenes automatically and add to the list
@@ -533,10 +515,10 @@ namespace Dilemma
             //Create Scene with choices, FINAL SCENE
             Scene sceneLast = new Scene
             {
-                Scene_id = i+1,
-                Characters = new List<string> { "g1_neutral.png", "g1_neutral.png", "alien_withbeanie.png" },
-                Dialogue = "Annie: I vote we get a ticket out of the country...",
-                Choices = new List<Choice> { c1, c2 }
+                Scene_id = i + 1,
+                Characters = new List<string> { "g1_neutral.png", "g1_neutral.png"},
+                Dialogue = "Annie: Okay, that was...",
+                Choices = new List<Choice> { c1 }
             };
             scenes.Add(sceneLast);
 
