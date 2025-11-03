@@ -348,6 +348,33 @@ namespace Dilemma
             // Continue Button, only if no choices
             if (noChoices)
             {
+                //stack so buttons don't overlap
+                StackPanel buttonPanel = new StackPanel()
+                {
+                    Orientation = Orientation.Horizontal,
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    Margin = new Thickness(10)
+                };
+
+                Button skipButton = new Button
+                {
+                    Content = "SKIP",
+                    FontFamily = new FontFamily("Reem Kufi"),
+                    FontSize = 40,
+                    Foreground = p.GetColour("DarkBrown"),
+                    Background = Brushes.Transparent,
+                    //extra border
+                    BorderBrush = p.GetColour("DarkBrown"),
+                    BorderThickness = new Thickness(2),
+                    Padding = new Thickness(5),
+                    Margin = new Thickness(35),
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment = VerticalAlignment.Bottom
+                };
+                skipButton.Click += SkipButtonClicked;
+                buttonPanel.Children.Add(skipButton);
+
+
                 Button continueButton = new Button
                 {
                     Content = ">>>",
@@ -364,7 +391,9 @@ namespace Dilemma
                     VerticalAlignment = VerticalAlignment.Bottom
                 };
                 continueButton.Click += ContinueButtonClicked;
-                dialogue_layer.Children.Add(continueButton);
+                buttonPanel.Children.Add(continueButton);
+                
+                dialogue_layer.Children.Add(buttonPanel);
             }
 
             // Add dialogue_layer to maingrid
@@ -375,8 +404,15 @@ namespace Dilemma
         }
         private void ContinueButtonClicked(object sender, RoutedEventArgs e)
         {
-            if (choices.Count > 0) { MessageBox.Show("Please make a choice!"); return; }
             sp.AllowContinue(0);
+
+            // Move focus to the window
+            this.Focus();  // set logical focus to the window
+            FocusManager.SetFocusedElement(this, this);
+        }
+        private async void SkipButtonClicked(object sender, RoutedEventArgs e)
+        {
+            await sp.SkipToLastScene();
 
             // Move focus to the window
             this.Focus();  // set logical focus to the window

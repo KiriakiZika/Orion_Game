@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Policy;
+using System.Security.RightsManagement;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,6 +17,8 @@ namespace Dilemma
     public class ScenePlayer
     {
         MainWin mw;
+        ScenePack currentPack = null;
+        Scene currentScene = null;
 
         // Custom EventArgs to pass selected choice ID
         public class ContinueEventArgs : EventArgs
@@ -30,6 +34,8 @@ namespace Dilemma
         // The main window will subscribe to this event.
         public event EventHandler<ContinueEventArgs> CanContinueChanged;
 
+        //if all scenes skipped, kill all awaits
+        private CancellationTokenSource sceneCts;
 
         public ScenePlayer(MainWin mainWin)
         {
@@ -38,8 +44,8 @@ namespace Dilemma
 
         public void Play()
         {
-            int starterPack = 1;
-            PlayPack(starterPack);
+            int starterPack_index = 1;
+            PlayPack(starterPack_index);
         }
 
         //DESERIALIZER
@@ -58,6 +64,7 @@ namespace Dilemma
             string json = File.ReadAllText(fileName);
             // Deserialize JSON
             ScenePack pack = JsonSerializer.Deserialize<ScenePack>(json);
+            currentPack = pack;
 
             if (pack == null)
             {
@@ -69,12 +76,12 @@ namespace Dilemma
             }
 
             // Start playing from the first scene
-            for (int i = 1; i <= pack.Scenes.Count; i++)
-            {
-                await PlayScene(pack, i);
-            }
+            int starterScene_index = 1;
+            // Create a new CancellationTokenSource for this scene sequence
+            sceneCts = new CancellationTokenSource();
+            await PlayScene(pack, starterScene_index, sceneCts.Token);
         }
-        private async Task PlayScene(ScenePack pack, int scene_id)
+        private async Task PlayScene(ScenePack pack, int scene_id, CancellationToken token)
         {
             Scene scene = pack.Scenes[scene_id-1];
             if (scene == null)
@@ -82,6 +89,8 @@ namespace Dilemma
                 new ErrorHandler(false, "Scene not found in pack");
                 return;
             }
+            currentScene = scene;
+            MessageBox.Show("Playing Scene " + scene.Scene_id);
 
             //Use scene-specific background and characters if they exist, otherwise use pack defaults
             string background = scene.Background_image ?? pack.Background_image;
@@ -95,23 +104,35 @@ namespace Dilemma
 
 
             // Wait for the player to make a choice, and get the ID
-            int selectedChoiceId = await WaitUntilCanContinueAsync();
-
-            //No choices made
-            if (selectedChoiceId == 0) 
+            try
             {
-                //Last scene in pack, go to next pack
-                if (scene_id >= pack.Scenes.Count)
+                int selectedChoiceId = await WaitUntilCanContinueAsync(token);
+                //No choices made
+                if (selectedChoiceId == 0)
                 {
-                    PlayPack(pack.Scenepack_id + 1);
+                    //Continue to next scene in pack
+                    if (scene_id < pack.Scenes.Count)
+                    {
+                        await PlayScene(pack, scene_id + 1, token);
+                    }
+                    //Last scene in pack, next pack
+                    else
+                    {
+                        PlayPack(pack.Scenepack_id + 1);
+                    }
+                    return;
                 }
-                return;
+                else// if (scene.Choices != null)
+                {
+                    //find id of choice made, go to outcome scenepack
+                    Choice selectedChoice = scene.Choices.FirstOrDefault(c => c.Choice_id == selectedChoiceId);
+                    PlayPack(selectedChoice.Outcome);
+                }
             }
-            else 
+            catch (TaskCanceledException)
             {
-                //find id of choice made, go to outcome scenepack
-                Choice selectedChoice = scene.Choices.FirstOrDefault(c => c.Choice_id == selectedChoiceId);
-                PlayPack(selectedChoice.Outcome);
+                // Scene was skipped, just exit immediately
+                return;
             }
         }
 
@@ -124,23 +145,46 @@ namespace Dilemma
         }
 
         //Waits until MainWin signals that player made a choice
-        private Task<int> WaitUntilCanContinueAsync()
+        private Task<int> WaitUntilCanContinueAsync(CancellationToken token)
         {
             var tcs = new TaskCompletionSource<int>();
 
             EventHandler<ContinueEventArgs> handler = null;
-            handler = delegate (object sender, ContinueEventArgs e)
+            handler = (sender, e) =>
             {
-                tcs.TrySetResult(e.SelectedChoiceId); // pass the selected ID
+                tcs.TrySetResult(e.SelectedChoiceId);
                 CanContinueChanged -= handler;
             };
 
             CanContinueChanged += handler;
 
+            // If the token is cancelled, cancel the task
+            token.Register(() =>
+            {
+                tcs.TrySetCanceled();
+                CanContinueChanged -= handler;
+            });
+
             return tcs.Task;
         }
 
 
+
+        //Other functionality
+        public async Task SkipToLastScene()
+        {
+            // Cancel all currently waiting scenes
+            sceneCts?.Cancel();
+
+            // Create a new token for the last scene
+            sceneCts = new CancellationTokenSource();
+
+            // Start last scene with new token
+            await PlayScene(currentPack, currentPack.Scenes.Count, sceneCts.Token);
+        }
+
+
+        //Updates the GUI with the current scene's assets and text
         private void UpdateSceneGUI(string background, List<string> characters, string dialogue, string[] choices = null)
         {
             //Directories
