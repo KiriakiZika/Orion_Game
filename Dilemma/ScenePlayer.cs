@@ -20,6 +20,7 @@ namespace Dilemma
         private readonly int starterPack_index = 1;
         private ScenePack currentPack = null;
         private Scene currentScene = null;
+        List<(ScenePack, Choice)> allPreviousChoices = new List<(ScenePack, Choice)>();
 
         // Custom EventArgs to pass selected choice ID
         public class ContinueEventArgs : EventArgs
@@ -49,7 +50,7 @@ namespace Dilemma
         }
 
         //DESERIALIZER
-        private async Task PlayPack(int sp_id)
+        private async Task PlayPack(int sp_id, int firstScene_index = 1) //if -1: last scene in pack
         {
             string fileName = "packs/" + "pack" + sp_id + ".json";
             
@@ -79,11 +80,14 @@ namespace Dilemma
                 new ErrorHandler(false,"Scenepack id isn't the same as requested");
             }
 
-            // Start playing from the first scene
-            int starterScene_index = 1;
             // Create a new CancellationTokenSource for this scene sequence
             sceneCts = new CancellationTokenSource();
-            await PlayScene(pack, starterScene_index, sceneCts.Token);
+            // Start playing from the first scene
+            if (firstScene_index == -1)
+            {
+                firstScene_index = pack.Scenes.Count;
+            }
+            await PlayScene(pack, firstScene_index, sceneCts.Token);
         }
         private async Task PlayScene(ScenePack pack, int scene_id, CancellationToken token)
         {
@@ -135,6 +139,7 @@ namespace Dilemma
                 {
                     //find id of choice made, go to outcome scenepack
                     Choice selectedChoice = scene.Choices.FirstOrDefault(c => c.Choice_id == selectedChoiceId);
+                    ChoiceMade(pack, selectedChoice);
                     await PlayPack(selectedChoice.Outcome);
                 }
             }
@@ -227,8 +232,22 @@ namespace Dilemma
             sceneCts = new CancellationTokenSource();
 
             // Start previous pack with new token
-            int previousPackIndex = currentPack.Scenepack_id - 1;
-            await PlayPack(previousPackIndex);
+            int previousPackIndex;
+            if (allPreviousChoices != null)
+            {
+                previousPackIndex = allPreviousChoices.Last().Item1.Scenepack_id;
+            }
+            else
+            {
+                previousPackIndex = currentPack.Scenepack_id - 1;
+            }
+
+            await PlayPack(previousPackIndex,-1);
+        }
+
+        private void ChoiceMade(ScenePack sp, Choice choice)
+        {
+            allPreviousChoices.Add((sp, choice));
         }
 
 

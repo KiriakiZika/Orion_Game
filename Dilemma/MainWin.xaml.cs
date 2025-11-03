@@ -373,8 +373,7 @@ namespace Dilemma
                 backButton.Click += backButtonClicked;
                 buttonPanel.Children.Add(backButton);
 
-            if (noChoices)
-            {
+
                 Button skipButton = new Button
                 {
                     Content = "SKIP",
@@ -411,6 +410,11 @@ namespace Dilemma
                 };
                 continueButton.Click += ContinueButtonClicked;
                 buttonPanel.Children.Add(continueButton);
+            
+            if (!noChoices)
+            {
+                skipButton.IsEnabled = false;
+                continueButton.IsEnabled = false;
             }
             dialogue_layer.Children.Add(buttonPanel);
 
@@ -452,7 +456,7 @@ namespace Dilemma
         public void StartGame()
         {
             //Create scenepacks
-            MakeScenePack();
+            //MakeScenePack();
 
             //Load scenepacks
             sp.Play();
