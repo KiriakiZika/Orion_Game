@@ -85,7 +85,7 @@ namespace Dilemma
             //Use scene-specific background and characters if they exist, otherwise use pack defaults
             string background = scene.Background_image ?? pack.Background_image;
             List<string> characters = scene.Characters ?? pack.Characters;
-            
+
             //Get dialogue text and choices
             string dialogue = scene.Dialogue;
             string[] choices = scene.Choices?.Select(c => c.Text).ToArray();
@@ -148,10 +148,11 @@ namespace Dilemma
             //Load static assets like background and characters
             string backgroundPath = System.IO.Path.Combine(imgsDir, background);
             string[] charFiles = new string[characters.Count];
-            foreach (var ch in characters)
+            
+            for (int i = 0 ; i < charFiles.Length; i++)
             {
-                string charPath = System.IO.Path.Combine(imgsDir, ch);
-                charFiles[characters.IndexOf(ch)] = charPath;
+                string charPath = System.IO.Path.Combine(imgsDir, characters[i]);
+                charFiles[i] = charPath;
             }
             mw.SetGUI(backgroundPath, charFiles, choices, dialogue);
         }

@@ -151,7 +151,7 @@ namespace Dilemma
             //CHARACTERS
             FillMainGrid(charFiles, buttonContents);
             //Second row
-            SetDialogueBubble(text);
+            SetDialogueBubble(text, buttonContents==null);
 
             this.Content = motherGrid;
         }
@@ -290,7 +290,7 @@ namespace Dilemma
             return container;
         }
         //DIALOGUE BOX
-        private void SetDialogueBubble(string text)
+        private void SetDialogueBubble(string text, bool noChoices)
         {
             Grid dialogue_layer = new Grid();
             dialogue_layer.ColumnDefinitions.Clear();
@@ -310,10 +310,10 @@ namespace Dilemma
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Bottom,
                 Height = SystemParameters.PrimaryScreenHeight / 4,
-                IsEnabled = false,
+                IsHitTestVisible = false, //isEnabled adds opacity
                 BorderBrush = p.GetColour("DarkBrown"),
                 BorderThickness = new Thickness(10),
-                Background = new SolidColorBrush(Color.FromArgb(230, 255, 255, 255)), // 128 = 50% opacity
+                Background = p.GetColour("Seashell"),
                 IsReadOnly = true,
                 Margin = new Thickness(10) //how indented the dialogueBox is inside parent (row 2)
             };
@@ -323,24 +323,27 @@ namespace Dilemma
             }
             dialogue_layer.Children.Add(dialogueBox);
 
-            // Continue Button
-            Button continueButton = new Button
+            // Continue Button, only if no choices
+            if (noChoices)
             {
-                Content = ">>>",
-                FontFamily = new FontFamily("Reem Kufi"),
-                FontSize = 40,
-                Foreground = p.GetColour("Champagne"),
-                Background = Brushes.Transparent,
-                //extra border
-                BorderBrush = p.GetColour("DarkBrown"),
-                BorderThickness = new Thickness(2),
-                Padding = new Thickness(5),
-                Margin = new Thickness(35),
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment = VerticalAlignment.Bottom
-            };
-            continueButton.Click += ContinueButtonClicked;
-            dialogue_layer.Children.Add(continueButton);
+                Button continueButton = new Button
+                {
+                    Content = ">>>",
+                    FontFamily = new FontFamily("Reem Kufi"),
+                    FontSize = 40,
+                    Foreground = p.GetColour("DarkBrown"),
+                    Background = Brushes.Transparent,
+                    //extra border
+                    BorderBrush = p.GetColour("DarkBrown"),
+                    BorderThickness = new Thickness(2),
+                    Padding = new Thickness(5),
+                    Margin = new Thickness(35),
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment = VerticalAlignment.Bottom
+                };
+                continueButton.Click += ContinueButtonClicked;
+                dialogue_layer.Children.Add(continueButton);
+            }
 
             // Add dialogue_layer to maingrid
             mainGrid.Children.Add(dialogue_layer);
@@ -363,59 +366,83 @@ namespace Dilemma
         //GAME COMPONENTS
         public void StartGame()
         {
-            MakeScenePacks();
+            //Create scenepacks
+            MakeScenePack();
 
-            //Load scenepack 1
+            //Load scenepacks
             sp.Play();
         }
-        private void MakeScenePacks()
+        private void MakeScenePack()
         {
             //default procedure
 
             int scenepack_id = 1;
             string background_image = "classroom.png";
-            List<string> characters = new List<string> { "g1_neutral.png", "alien_withbeanie.png" };
+            List<string> characters = new List<string> { "g1_neutral.png", "g1_neutral.png" };
 
             //-----------1-----------
             //Create Choices (if any)
             Choice c1 = new Choice
             {
                 Choice_id = 1,
-                Text = "Go left",
+                Text = "Risk it all for character development.",
                 Outcome = 2
             };
             Choice c2 = new Choice
             {
                 Choice_id = 2,
-                Text = "Go right",
+                Text = "Stay safe and let natural selection work.",
+                //Pretend you didn’t see anything and walk away slowly.
+                //Nope. That sounds like a “him” problem.
                 Outcome = 3
             };
 
             //-----------2-----------
-            //Create Scene without choices, default background and default characters
-            Scene scene1 = new Scene 
+            //Create Scenes before the choices
+            
+            //list for all scenes
+            List<Scene> scenes = new List<Scene>();
+
+            //for ease, use a list for text
+            List<string> dialogues = new List<string>
             {
-                Scene_id = 1,
-                Dialogue = "You are in a forest."
+                "Annie: Well, that was weird.",
+                "Mads: Eh, a weird guy munching on a sweater. I've seen worse.",
+                "Annie: You're right. Let's go to class.",
+                "Mads: Wait. See that? That's the weird guy from the park.",
+                "Annie: What is Jessica doing with him?",
+                "Mads: She seems to be bothering him. We should go help him."
             };
 
-            //Create Scene with choices, custom background and custom characters
-            Scene scene2 = new Scene
+            //Create all scenes automatically and add to the list
+            int i;
+            for (i = 0; i < dialogues.Count; i++)
             {
-                Scene_id = 2,
+                Scene scene = new Scene
+                {
+                    Scene_id = i + 1,
+                    Dialogue = dialogues[i]
+                };
+                if (i == 4 || i == 5)
+                {
+                    scene.Background_image = "hallway.png";
+                }
+                scenes.Add(scene);
+            }
+
+            //Create Scene with choices, FINAL SCENE
+            Scene sceneLast = new Scene
+            {
+                Scene_id = i+1,
                 Background_image = "hallway.png",
-                Characters = new List<string> { "g1_happy.png", "alien_withoutbeanie.png" },
-                Dialogue = "Which way do you go?",
+                Characters = new List<string> { "g1_confused.png", "g1_neutral.png" },
+                Dialogue = "Annie: Are you sure?",
                 Choices = new List<Choice> { c1, c2 }
             };
-            //Note: don't make a scene after one with choices, because it won't ever play
+            scenes.Add(sceneLast);
 
-            //-----------3-----------
-            List<Scene> scenes = new List<Scene>();
-            //Add all scenes to a list
-            scenes.Add(scene1);
-            scenes.Add(scene2);
 
+            //-----------3----------
             ScenePackBuilder.CreateCostumScenePack(scenepack_id, background_image, characters, scenes);
         }
     }

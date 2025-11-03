@@ -22,6 +22,7 @@ namespace Dilemma
             SolidColorBrush Colour4_mountain = (SolidColorBrush)new BrushConverter().ConvertFrom("#9D8189");
             SolidColorBrush Colour5_platinum = (SolidColorBrush)new BrushConverter().ConvertFrom("#D8E2DC");
             SolidColorBrush Colour6_darkbrown = (SolidColorBrush)new BrushConverter().ConvertFrom("#120d0a");
+            SolidColorBrush Colour7_seashell = (SolidColorBrush)new BrushConverter().ConvertFrom("#FDF5ED");
             SolidColorBrush ColourX_error = (SolidColorBrush)new BrushConverter().ConvertFrom("#6F170B");
 
             Colours = new Dictionary<string, SolidColorBrush>
@@ -32,6 +33,7 @@ namespace Dilemma
                 { "Mountain", Colour4_mountain },
                 { "Platinum", Colour5_platinum },
                 { "DarkBrown", Colour6_darkbrown },
+                { "Seashell", Colour7_seashell },
                 { "Error", ColourX_error}
             };
         }
