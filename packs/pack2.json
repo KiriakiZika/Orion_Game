@@ -1,0 +1,116 @@
+{
+  "Scenepack_id": 2,
+  "Background_image": "hallway.png",
+  "Characters": [
+    "g1_confused.png",
+    "g1_confused.png",
+    "g1_happy.png"
+  ],
+  "Scenes": [
+    {
+      "Scene_id": 1,
+      "Dialogue": "Annie: Okay, let\u0027s risk it all to help him."
+    },
+    {
+      "Scene_id": 2,
+      "Dialogue": "*The girls walk over to Jessica, trembling.*"
+    },
+    {
+      "Scene_id": 3,
+      "Dialogue": "Mads: Hey, Jessica."
+    },
+    {
+      "Scene_id": 4,
+      "Dialogue": "Annie: Stop bothering him, okay?"
+    },
+    {
+      "Scene_id": 5,
+      "Dialogue": "Jessica: Well, well, well. You think you can be heroes?"
+    },
+    {
+      "Scene_id": 6,
+      "Dialogue": "Mads: We just\u2026 thought you should stop picking on him."
+    },
+    {
+      "Scene_id": 7,
+      "Dialogue": "Jessica: Aw, that\u2019s adorable. You thought you could stop me?"
+    },
+    {
+      "Scene_id": 8,
+      "Dialogue": "*Jessica\u2019s friends snicker behind her. The new kid stares at the ground.*"
+    },
+    {
+      "Scene_id": 9,
+      "Dialogue": "Annie: Leave him alone, Jessica. Seriously."
+    },
+    {
+      "Scene_id": 10,
+      "Dialogue": "Jessica: Or what? You\u2019ll write me a strongly worded text?"
+    },
+    {
+      "Scene_id": 11,
+      "Dialogue": "*She steps closer, towering over Annie.*"
+    },
+    {
+      "Scene_id": 12,
+      "Dialogue": "Mads: (muttering) This was a terrible idea."
+    },
+    {
+      "Scene_id": 13,
+      "Dialogue": "Jessica grabs Annie\u2019s notebook and flips through it mockingly."
+    },
+    {
+      "Scene_id": 14,
+      "Dialogue": "Jessica: Wow, all these numbers. You must be a genius."
+    },
+    {
+      "Scene_id": 15,
+      "Dialogue": "Annie: Give it back! That\u0027s my homework!"
+    },
+    {
+      "Scene_id": 16,
+      "Dialogue": "*Jessica tosses it into the ground. The girls freeze.*"
+    },
+    {
+      "Scene_id": 17,
+      "Dialogue": "Jessica: Oops. Guess I\u2019m clumsy."
+    },
+    {
+      "Scene_id": 18,
+      "Dialogue": "*The laughter from Jessica\u2019s group echoes down the hall as they walk away.*"
+    },
+    {
+      "Scene_id": 19,
+      "Dialogue": "Annie: (quietly) We tried to help\u2026"
+    },
+    {
+      "Scene_id": 20,
+      "Dialogue": "Mads: Yeah. And we just made it worse."
+    },
+    {
+      "Scene_id": 21,
+      "Dialogue": "Annie: What do we do now?"
+    },
+    {
+      "Scene_id": 22,
+      "Characters": [
+        "g1_neutral.png",
+        "g1_neutral.png",
+        "alien_withbeanie.png"
+      ],
+      "Dialogue": "Annie: I vote we get a ticket out of the country...",
+      "Choices": [
+        {
+          "Choice_id": 1,
+          "Text": "Talk to the new kid.",
+          "Outcome": 4
+        },
+        {
+          "Choice_id": 2,
+          "Text": "Re-do your math homework.",
+          "Outcome": 5
+        }
+      ]
+    }
+  ]
+}

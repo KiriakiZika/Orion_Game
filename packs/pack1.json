@@ -1,0 +1,57 @@
+{
+  "Scenepack_id": 1,
+  "Background_image": "classroom.png",
+  "Characters": [
+    "g1_neutral.png",
+    "g1_neutral.png"
+  ],
+  "Scenes": [
+    {
+      "Scene_id": 1,
+      "Dialogue": "Annie: Well, that was weird."
+    },
+    {
+      "Scene_id": 2,
+      "Dialogue": "Mads: Eh, a weird guy munching on a sweater. I\u0027ve seen worse."
+    },
+    {
+      "Scene_id": 3,
+      "Dialogue": "Annie: You\u0027re right. Let\u0027s go to class."
+    },
+    {
+      "Scene_id": 4,
+      "Dialogue": "Mads: Wait. See that? That\u0027s the weird guy from the park."
+    },
+    {
+      "Scene_id": 5,
+      "Background_image": "hallway.png",
+      "Dialogue": "Annie: What is Jessica doing with him?"
+    },
+    {
+      "Scene_id": 6,
+      "Background_image": "hallway.png",
+      "Dialogue": "Mads: She seems to be bothering him. We should go help him."
+    },
+    {
+      "Scene_id": 7,
+      "Background_image": "hallway.png",
+      "Characters": [
+        "g1_confused.png",
+        "g1_neutral.png"
+      ],
+      "Dialogue": "Annie: Are you sure?",
+      "Choices": [
+        {
+          "Choice_id": 1,
+          "Text": "Risk it all for character development.",
+          "Outcome": 2
+        },
+        {
+          "Choice_id": 2,
+          "Text": "Stay safe and let natural selection work.",
+          "Outcome": 3
+        }
+      ]
+    }
+  ]
+}

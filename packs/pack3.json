@@ -1,0 +1,33 @@
+{
+  "Scenepack_id": 3,
+  "Background_image": "hallway.png",
+  "Characters": [
+    "g1_neutral.png",
+    "g1_neutral.png"
+  ],
+  "Scenes": [
+    {
+      "Scene_id": 1,
+      "Dialogue": "Annie: You\u0027re probably right."
+    },
+    {
+      "Scene_id": 2,
+      "Dialogue": "Mads: Okay, let\u0027s go."
+    },
+    {
+      "Scene_id": 3,
+      "Characters": [
+        "g1_neutral.png",
+        "g1_neutral.png"
+      ],
+      "Dialogue": "Annie: Okay...",
+      "Choices": [
+        {
+          "Choice_id": 1,
+          "Text": "Go home.",
+          "Outcome": 5
+        }
+      ]
+    }
+  ]
+}

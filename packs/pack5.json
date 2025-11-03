@@ -1,0 +1,29 @@
+{
+  "Scenepack_id": 5,
+  "Background_image": "hallway.png",
+  "Characters": [
+    "g1_neutral.png",
+    "g1_neutral.png"
+  ],
+  "Scenes": [
+    {
+      "Scene_id": 1,
+      "Dialogue": "NEXT DAY."
+    },
+    {
+      "Scene_id": 2,
+      "Characters": [
+        "g1_neutral.png",
+        "g1_neutral.png"
+      ],
+      "Dialogue": "Annie: Okay...",
+      "Choices": [
+        {
+          "Choice_id": 1,
+          "Text": "Go home.",
+          "Outcome": 5
+        }
+      ]
+    }
+  ]
+}

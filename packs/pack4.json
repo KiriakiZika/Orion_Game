@@ -1,0 +1,38 @@
+{
+  "Scenepack_id": 4,
+  "Background_image": "hallway.png",
+  "Characters": [
+    "g1_neutral.png",
+    "g1_neutral.png",
+    "alien_withbeanie.png"
+  ],
+  "Scenes": [
+    {
+      "Scene_id": 1,
+      "Dialogue": "Annie: Blah."
+    },
+    {
+      "Scene_id": 2,
+      "Dialogue": "Mads: Blah."
+    },
+    {
+      "Scene_id": 3,
+      "Dialogue": "New kid: Blah."
+    },
+    {
+      "Scene_id": 4,
+      "Characters": [
+        "g1_neutral.png",
+        "g1_neutral.png"
+      ],
+      "Dialogue": "Annie: Okay, that was...",
+      "Choices": [
+        {
+          "Choice_id": 1,
+          "Text": "Go home.",
+          "Outcome": 5
+        }
+      ]
+    }
+  ]
+}
